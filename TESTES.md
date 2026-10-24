@@ -86,6 +86,7 @@ Relógio fixo de referência: `AGORA = 2026-10-24T12:00:00Z`. **Nunca** use `Dat
 | UT-15 | Busca sem resultados | retorna `[]`, sem erro | RF01 | P1 |
 | UT-16 | Preço sem `data_coleta` | permanece visível com `valido: false` e fora do ranking | RN01, RN04 | P0 |
 | UT-17 | Comparação de duas ofertas sem data | exibe diferença nominal em centavos sem atribuir vencedor atual | RF02, RN09 | P0 |
+| UT-18 | Cadastro público e acesso do lojista | e-mail único, senha protegida e mercado ativo não-demo vinculados; login concede acesso ao painel | RF06, RN07, RNF03 | P0 |
 
 ### Exemplo de teste (nomes ilustrativos)
 
@@ -120,6 +121,7 @@ describe('RN01 — validade de 30 dias', () => {
 | SEED-03 | Fixture do P4 | dois preços iguais em mercados distintos, com datas diferentes | P1 |
 | SEED-04 | Sanidade dos preços | nenhuma `data_coleta` futura; todo valor inteiro > 0 | P0 |
 | SEED-05 | Preços reais informados | os 10 valores Arasuper/Assaí têm `verified=1` e `collected_at=2026-10-24` | P0 |
+| BOOT-01 | Inicialização em banco vazio e legado | migra `image_url`, carrega catálogo real uma vez e preserva dados após chamadas repetidas | RF11, RF12 | P0 |
 
 ## 5. Casos de API (integração)
 
@@ -137,6 +139,7 @@ describe('RN01 — validade de 30 dias', () => {
 | API-15 | Preços-base confirmados e datados | os 10 preços mostram coleta 2026-10-24 e ficam válidos/rankeados dentro dos 30 dias | RF12, RN01 | P0 |
 | API-16 | Atualização autenticada pelo lojista | registro novo recebe `verified: true` e a coleta informada | RF08, RN06 | P0 |
 | API-17 | Filtro estadual `state=AC` | mercados e preços de qualquer município do Acre cadastrado são incluídos | RF13 | P0 |
+| API-18 | `GET /api/v1/products` | `image_url` é caminho local existente para imagens ilustrativas | RF11 | P1 |
 | API-10 | `POST /api/v1/prices` sem `X-API-Key` | `401` | RF15 | P2 |
 | API-11 | POST com chave de outro mercado | `403` | RF15, RN07 | P2 |
 | API-12 | POST válido | `201`; preço aparece no GET | RF15 | P2 |
@@ -166,6 +169,9 @@ describe('RN01 — validade de 30 dias', () => {
 | MV-03 | Dados semeados | rotulados como demonstração | P1 |
 | MV-04 | Busca vazia / erro de rede | estado vazio e mensagem clara | P1 |
 | MV-05 | Preço vencido | selo visível e legível | P0 |
+| MV-06 | Lista de produtos | busca opcional, seis itens por página, contraste entre linhas e paginação funcional | RF01, RF11 | P1 |
+| MV-07 | Estado sem seleção | tabela e localização dos mercados ficam ocultas até selecionar um produto | RF02, RF03 | P0 |
+| MV-08 | Cadastro público de lojista | escolher mercado revela localidade; cadastro concluído permite login e painel | RF06, RF07 | P0 |
 
 ## 8. Rastreabilidade
 

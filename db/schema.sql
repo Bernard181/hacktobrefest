@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS product (
   brand TEXT NOT NULL DEFAULT '',
   category TEXT NOT NULL,
   unit TEXT NOT NULL,
+  image_url TEXT,
   ean TEXT,
   active INTEGER NOT NULL DEFAULT 1 CHECK (active IN (0, 1)),
   UNIQUE(name, brand, unit)

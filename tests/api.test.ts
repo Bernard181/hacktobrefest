@@ -1,11 +1,16 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { NextRequest } from 'next/server'
+import Database from 'better-sqlite3'
+import fs from 'node:fs'
+import path from 'node:path'
 
 const authState = vi.hoisted(() => ({ user: { id: 'user-m1', email: 'merchant@example.test', role: 'merchant' as const, marketId: 'M1' as string | null } }))
 vi.mock('@/lib/auth', () => ({ requireMerchant: async () => authState.user, hashPassword: async (password: string) => `test-hash:${password}` }))
 
 process.env.DB_PATH = ':memory:'
 let getDb: typeof import('@/lib/db')['getDb']
+let bootstrapBaseCatalog: typeof import('@/lib/db')['bootstrapBaseCatalog']
+let migrateDatabase: typeof import('@/lib/db')['migrateDatabase']
 let productsGET: typeof import('@/app/api/v1/products/route')['GET']
 let pricesGET: typeof import('@/app/api/v1/prices/route')['GET']
 let marketsGET: typeof import('@/app/api/v1/markets/route')['GET']
@@ -13,7 +18,7 @@ let merchantGET: typeof import('@/app/api/merchant/prices/route')['GET']
 let merchantPOST: typeof import('@/app/api/merchant/prices/route')['POST']
 
 beforeAll(async () => {
-  ;({ getDb } = await import('@/lib/db'))
+  ;({ getDb, bootstrapBaseCatalog, migrateDatabase } = await import('@/lib/db'))
   ;({ GET: productsGET } = await import('@/app/api/v1/products/route'))
   ;({ GET: pricesGET } = await import('@/app/api/v1/prices/route'))
   ;({ GET: marketsGET } = await import('@/app/api/v1/markets/route'))
@@ -58,7 +63,14 @@ describe('API pública (contrato v1)', () => {
   it('API-07 permite leitura sem credencial', async () => expect((await marketsGET(req('/api/v1/markets'))).status).toBe(200))
   it('API-08 lista mercados com endereço e cidade', async () => {
     const items = (await (await marketsGET(req('/api/v1/markets'))).json()).items
-    expect(items.find((item: any) => item.id === 'M1')).toMatchObject({ name: 'Mercado Centro', city: 'Rio Branco', demo: true })
+    expect(items.find((item: any) => item.id === 'arasuper')).toMatchObject({ name: 'Arasuper', city: 'Rio Branco', state: 'AC', demo: false })
+    expect(items.some((item: any) => item.demo)).toBe(false)
+  })
+  it('API-18 retorna image_url local no contrato público de produto', async () => {
+    const response = await productsGET(req('/api/v1/products?q=brilhante'))
+    const product = (await response.json()).items[0]
+    expect(product.image_url).toBe('/products/arroz-brilhante-5kg.webp')
+    expect(fs.existsSync(path.join(process.cwd(), 'public', product.image_url.slice(1)))).toBe(true)
   })
   it('API-17 filtra mercados e preços por todo o estado informado', async () => {
     getDb().prepare("INSERT INTO market (id,name,city,state,active,demo) VALUES ('market-cruzeiro','Mercado de Cruzeiro do Sul','Cruzeiro do Sul','AC',1,0)").run()
@@ -135,6 +147,41 @@ describe('API de lojista', () => {
 })
 
 describe('integridade do seed', () => {
+  it('BOOT-01 inicializa catálogo vazio uma vez e preserva o que já existe', () => {
+    const isolated = new Database(':memory:')
+    try {
+      const legacySchema = fs.readFileSync(path.join(process.cwd(), 'db', 'schema.sql'), 'utf8')
+        .replace(/^\s*state TEXT NOT NULL DEFAULT 'AC',\r?\n/m, '')
+        .replace(/^\s*verified INTEGER NOT NULL DEFAULT 0 CHECK \(verified IN \(0, 1\)\),\r?\n/m, '')
+        .replace(/^\s*image_url TEXT,\r?\n/m, '')
+      isolated.exec(legacySchema)
+      migrateDatabase(isolated)
+      const migratedProducts = isolated.prepare('PRAGMA table_info(product)').all() as { name: string }[]
+      expect(migratedProducts.some(({ name }) => name === 'image_url')).toBe(true)
+      expect(bootstrapBaseCatalog(isolated)).toBe(true)
+      expect((isolated.prepare('SELECT COUNT(*) AS count FROM product').get() as any).count).toBe(5)
+      expect((isolated.prepare('SELECT COUNT(*) AS count FROM price').get() as any).count).toBe(10)
+      expect((isolated.prepare('SELECT COUNT(*) AS count FROM user').get() as any).count).toBe(0)
+      expect((isolated.prepare('SELECT COUNT(*) AS count FROM market WHERE demo=1').get() as any).count).toBe(0)
+      const images = isolated.prepare('SELECT image_url FROM product ORDER BY id').all() as { image_url: string | null }[]
+      expect(images).toHaveLength(5)
+      expect(images.every(({ image_url }) => image_url?.startsWith('/products/'))).toBe(true)
+      const basePrices = isolated.prepare('SELECT id,value_cents,collected_at,verified FROM price ORDER BY id').all() as any[]
+      expect(basePrices.map(({ id, value_cents }) => [id, value_cents])).toEqual([
+        ['base-arasuper-acucar-itamarati-1kg', 309], ['base-arasuper-arroz-brilhante-5kg', 2799], ['base-arasuper-cafe-vovo-pureza-250g', 1399], ['base-arasuper-farinha-campesina-1kg', 559], ['base-arasuper-feijao-dona-de-1kg', 759],
+        ['base-assai-acucar-itamarati-1kg', 249], ['base-assai-arroz-brilhante-5kg', 2349], ['base-assai-cafe-vovo-pureza-250g', 1249], ['base-assai-farinha-campesina-1kg', 349], ['base-assai-feijao-dona-de-1kg', 665],
+      ].sort(([left], [right]) => String(left).localeCompare(String(right))))
+      expect(basePrices.every(({ collected_at, verified }) => collected_at === '2026-10-24' && verified === 1)).toBe(true)
+
+      isolated.prepare("INSERT INTO product (id,name,brand,category,unit,image_url) VALUES ('preserve-me','Preservar','','Teste','1 un',NULL)").run()
+      expect(bootstrapBaseCatalog(isolated)).toBe(false)
+      expect((isolated.prepare('SELECT COUNT(*) AS count FROM product').get() as any).count).toBe(6)
+      expect((isolated.prepare('SELECT COUNT(*) AS count FROM price').get() as any).count).toBe(10)
+      expect(isolated.prepare("SELECT id FROM product WHERE id='preserve-me'").get()).toBeTruthy()
+    } finally {
+      isolated.close()
+    }
+  })
   it('SEED-01 contém três mercados fictícios ativos em Rio Branco', () => {
     const rows = getDb().prepare("SELECT COUNT(*) AS count FROM market WHERE demo=1 AND active=1 AND city='Rio Branco'").get() as any
     expect(rows.count).toBe(3)
@@ -155,7 +202,7 @@ describe('integridade do seed', () => {
     expect(rows.every((row) => Number.isInteger(row.value_cents) && row.value_cents > 0 && (!row.collected_at || row.collected_at <= '2026-10-24'))).toBe(true)
   })
   it('SEED-05 marca como verificados os dez preços fornecidos para os mercados reais', () => {
-    const rows = getDb().prepare("SELECT COUNT(*) AS count FROM price WHERE id LIKE 'real-%' AND verified=1 AND collected_at='2026-10-24'").get() as any
+    const rows = getDb().prepare("SELECT COUNT(*) AS count FROM price WHERE id LIKE 'base-%' AND verified=1 AND collected_at='2026-10-24'").get() as any
     expect(rows.count).toBe(10)
   })
   it('SM-04 cria usuário de demonstração com senha apenas como hash e vínculo Arasuper', () => {

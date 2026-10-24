@@ -8,7 +8,7 @@ Next.js App Router, TypeScript e SQLite.
 
 ```bash
 npm install
-npm run db:reset
+npm run db:bootstrap
 npm run dev
 ```
 
@@ -20,4 +20,4 @@ npm run typecheck
 npm run smoke
 ```
 
-`npm run` lista os scripts disponíveis. `npm run db:reset` restaura os preços-base informados para Arasuper e Assaí com coleta em 24/10/2026 e dados de demonstração. A API consulta mercados por UF (`state=AC`); os mercados-base informados estão em Rio Branco, sem endereço presumido.
+`npm run` lista os scripts disponíveis. O `predev` e o `prestart` executam o bootstrap idempotente: o catálogo só é criado quando o banco está vazio. `npm run db:reset` recria a base local e apaga os dados existentes; use apenas em desenvolvimento. Configure `DATABASE_PATH` para um disco persistente no deploy. Os preços-base de Arasuper e Assaí usam coleta em 24/10/2026. A API consulta mercados por UF (`state=AC`); os mercados-base estão em Rio Branco, sem endereço presumido.

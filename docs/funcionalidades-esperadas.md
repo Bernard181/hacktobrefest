@@ -10,17 +10,17 @@ Permitir que moradores do Acre encontrem produtos básicos e comparem preços po
 
 | ID | Funcionalidade | Regra de aceite | Validação |
 |---|---|---|---|
-| FE-01 | Catálogo básico | Produto tem nome, marca, categoria e unidade; unidades diferentes permanecem como itens distintos. | UT-10, API-01/02 |
+| FE-01 | Catálogo básico | Produto tem nome, marca, categoria, unidade e imagem ilustrativa local; unidades diferentes permanecem como itens distintos. | UT-10, API-01/02/18 |
 | FE-02 | Busca pública | Buscar sem login por nome/marca, sem diferenciar maiúsculas ou acentos, e filtrar por categoria. Busca vazia não gera erro. | UT-15, API-01/02, SM-01 |
-| FE-03 | Comparação em tabela | Para cada produto, mostrar o preço mais recente de cada mercado, marca/unidade, data, endereço quando conhecido e diferença nominal entre ofertas. | UT-17, SM-02, MV-01/02 |
+| FE-03 | Comparação em tabela | A tabela e a localização só aparecem após selecionar um produto; mostrar o preço mais recente de cada mercado, marca/unidade, data, endereço quando conhecido e diferença nominal entre ofertas. | UT-17, SM-02, MV-01/02/07 |
 | FE-04 | Ranking transparente | Somente preços válidos entram no ranking; menor valor vence; empates preservam os mercados empatados e priorizam coleta mais recente. | UT-01..08, SM-02 |
 | FE-05 | Frescor e verificação dos dados | `verified` registra confirmação da informação; a validade depende da coleta. Preços sem data ficam visíveis, sinalizados e fora do ranking atual. | UT-01..05, UT-16, API-15, SEED-05, SM-03, MV-05 |
 | FE-06 | API pública de leitura | `GET /api/v1/products`, `/markets` e `/prices` retornam JSON documentado, sem credenciais, com CORS e estados de erro consistentes. | API-01..09, SM-06 |
-| FE-07 | Sessão do lojista | A área de gestão exige autenticação; senha armazenada em hash; sessão usa cookie protegido. | UT-14, SM-04 |
+| FE-07 | Cadastro e sessão do lojista | Cadastro público vincula a conta a um mercado ativo; selecionar o mercado revela sua localização. Login libera o painel; senha armazenada em hash e sessão em cookie protegido. | UT-14/18, SM-04, MV-08 |
 | FE-08 | Isolamento por mercado | O servidor deriva o mercado da sessão e rejeita tentativa de gravar em outro mercado. | UT-12, SM-04 |
 | FE-09 | Atualização segura | Validar centavos inteiros positivos e data não futura; nova coleta cria novo registro sem apagar histórico. | UT-09, UT-11, UT-08, SM-04/05 |
-| FE-10 | Experiência acessível no celular | Interface em pt-BR com estados de carregamento, vazio e erro; tabela permanece utilizável em telas estreitas. | SM-01, MV-01..05 |
-| FE-11 | Seed reproduzível | `npm run db:reset` restaura catálogo, preços informados e fixtures determinísticas sem depender de digitação manual. | SEED-01..04, API-03/04 |
+| FE-10 | Experiência acessível no celular | Interface em pt-BR com lista de produtos, busca opcional, paginação e contraste legível; estados de carregamento, vazio e erro; tabela permanece utilizável em telas estreitas. | SM-01, MV-01..07 |
+| FE-11 | Seed reproduzível | Bootstrap de desenvolvimento/deploy carrega catálogo e preços-base apenas em banco vazio; `npm run db:reset` recria base local e fixtures determinísticas. | BOOT-01, SEED-01..05, API-03/04 |
 | FE-12 | Qualidade de entrega | Testes unitários/API, typecheck, build e smoke precisam passar antes da entrega. | `npm test`, `npm run typecheck`, `npm run build`, `npm run smoke` |
 
 ## Dados de referência dos mercados
@@ -37,14 +37,14 @@ Os dez valores fornecidos pelo usuário são armazenados em centavos e associado
 
 ## Fora do MVP
 
-Aplicativo nativo, geolocalização, múltiplas cidades, scraping, OCR, integração real com PDV, pagamentos, favoritos, notificações, gráficos históricos, cadastro aberto de mercados e API key de escrita. Só devem entrar após os critérios obrigatórios acima estarem aprovados.
+Aplicativo nativo, geolocalização, scraping, OCR, integração real com PDV, pagamentos, favoritos, notificações, gráficos históricos, cadastro aberto de mercados e API key de escrita. Só devem entrar após os critérios obrigatórios acima estarem aprovados.
 
 ## Roteiro curto de aceite
 
 1. Abrir a página inicial sem login e buscar arroz.
 2. Conferir a tabela por mercado, unidade, preço e estado da data de coleta.
 3. Verificar que os dez preços-base exibem coleta em 24/10/2026 e podem participar do ranking dentro da janela de validade.
-4. Entrar com a conta local de demonstração e atualizar um preço próprio.
+4. Criar uma conta pública de lojista para um mercado ativo, entrar e atualizar um preço próprio.
 5. Tentar alterar o `market_id`; a API deve rejeitar a operação.
 6. Confirmar que a nova oferta aparece na tabela e na API pública.
 7. Rodar testes, typecheck, build e smoke.

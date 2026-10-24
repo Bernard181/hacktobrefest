@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "predev": "tsx db/bootstrap.ts",
     "dev": "next dev",
+    "prestart": "tsx db/bootstrap.ts",
     "build": "next build",
     "start": "next start",
     "db:reset": "tsx db/seed.ts",
+    "db:bootstrap": "tsx db/bootstrap.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",

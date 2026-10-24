@@ -17,7 +17,7 @@ export async function GET() {
   if (!market) return json({ error: 'Mercado não encontrado' }, 403)
   const products = getDb().prepare('SELECT DISTINCT product_id FROM price WHERE market_id=?').all(marketId) as { product_id: string }[]
   const items = products.flatMap(({ product_id }) => {
-    const p = getDb().prepare('SELECT id,name,brand,category,unit FROM product WHERE id=?').get(product_id)
+    const p = getDb().prepare('SELECT id,name,brand,category,unit,image_url FROM product WHERE id=?').get(product_id)
     if (!p) return []
     const product = productRow(p)
     return getProductOffers(product_id, market.state, marketId).map((offer) => ({ ...offer, product }))

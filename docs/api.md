@@ -11,7 +11,7 @@ O schema em `db/schema.sql` é a fonte de verdade. IDs são strings estáveis. D
 - Público, JSON, CORS `*`.
 - `q` busca sem diferenciar caixa ou acentos; `category` filtra por igualdade sem diferenciar caixa.
 - `200`: `{ "items": Product[] }`.
-- Produto: `{ "id": string, "name": string, "brand": string, "category": string, "unit": string }`.
+- Produto: `{ "id": string, "name": string, "brand": string, "category": string, "unit": string, "image_url": string | null }`. `image_url` é um caminho local servido pelo frontend, por exemplo `/products/arroz-brilhante-5kg.webp`.
 - Sem resultados: `200 { "items": [] }`.
 
 ## GET /api/v1/markets?state=
@@ -44,6 +44,7 @@ Backend implementa em `lib/prices.ts`; frontend não replica a validade.
 - `lib/auth.ts` exporta `SessionUser = { id: string; email: string; role: 'consumer' | 'merchant'; marketId: string | null }`, `getSessionUser(): Promise<SessionUser | null>`, `requireMerchant(): Promise<SessionUser>` (lança `AuthError` com status `401` ou `403`), `signIn(email, password): Promise<SessionUser | null>`, `signOut(): Promise<void>` e `hashPassword(password): Promise<string>` para o seed.
 - Cookie de sessão HttpOnly, SameSite=Lax, Secure em produção; senhas com hash.
 - `POST /api/merchant/prices` aceita sessão de lojista e `{ product_id, value_cents, collected_at }`; market_id vem da sessão, nunca do corpo. Insere preço append-only. Erros: `400` validação, `401` sem sessão, `403` role/loja inadequada.
+- Cadastro público é entregue em `/cadastro/lojista`: o usuário escolhe um mercado ativo não-demo, cria credenciais e então entra pela rota de login. O vínculo do mercado é validado e persistido no servidor; a localização cadastrada só é revelada após a seleção no formulário.
 - API key / `POST /api/v1/prices` é stretch e não será implementado nesta entrega do MVP.
 
 Rotas privadas do painel:
@@ -54,3 +55,5 @@ Rotas privadas do painel:
 ## Seed e demonstração
 
 Os preços fornecidos para Arasuper e Assaí são incluídos com `verified: true` e `collected_at: 2026-10-24`, data de coleta informada pelo usuário. A API permite consultar todos os municípios do Acre (`state=AC`). Os dois mercados-base estão cadastrados em Rio Branco, pois não foram informados outros municípios nem endereços; cobertura estadual não significa que existam filiais cadastradas em todo o estado. Fixtures com endereços/dados fictícios dos testes precisam ser marcadas `demo: true` e claramente rotuladas na interface.
+
+`npm run db:bootstrap` (executado automaticamente antes de `dev` e `start`) cria a população inicial apenas quando o catálogo está vazio. Não apaga usuários, preços nem mercados existentes; `npm run db:reset` permanece uma operação destrutiva somente para desenvolvimento.

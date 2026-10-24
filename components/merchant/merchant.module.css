@@ -12,6 +12,11 @@
 .form button:disabled { opacity: .65; cursor: wait; }
 .secondary { background: #edf4ee; color: #285737; }
 .error { border-radius: 8px; padding: 12px; color: #9f2f27; background: #fff0ee; }
+.success { border-radius: 8px; padding: 12px; color: #225b32; background: #edf8ef; }
+.registerLink { margin-top: 22px; color: #526258; font-size: 14px; }
+.registerLink a { color: #26723c; font-weight: 700; }
+.marketLocation { display: grid; gap: 4px; padding: 12px; border-radius: 9px; background: #f1f6f1; color: #506257; font-size: 14px; }
+.marketLocation strong { color: #273b2d; }
 .heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
 .heading p { margin: 0; }
 .grid { display: grid; grid-template-columns: minmax(260px, .8fr) minmax(0, 1.2fr); gap: 20px; }

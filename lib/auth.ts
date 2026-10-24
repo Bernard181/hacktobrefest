@@ -1,4 +1,4 @@
-import { createHmac, createHash, timingSafeEqual } from 'node:crypto'
+import { createHmac, createHash, randomUUID, timingSafeEqual } from 'node:crypto'
 import bcrypt from 'bcryptjs'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
@@ -73,6 +73,33 @@ export async function signOut(): Promise<void> {
 
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12)
+}
+
+export type MerchantRegistrationResult =
+  | { ok: true; user: SessionUser }
+  | { ok: false; reason: 'invalid_email' | 'short_password' | 'password_too_long' | 'market_unavailable' | 'email_in_use' }
+
+export async function registerMerchant(email: string, password: string, marketId: string): Promise<MerchantRegistrationResult> {
+  const normalizedEmail = email.trim().toLocaleLowerCase('en-US')
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) return { ok: false, reason: 'invalid_email' }
+  if (password.length < 8) return { ok: false, reason: 'short_password' }
+  if (Buffer.byteLength(password, 'utf8') > 72) return { ok: false, reason: 'password_too_long' }
+
+  const db = getDb()
+  const market = db.prepare('SELECT id FROM market WHERE id = ? AND active = 1 AND demo = 0').get(marketId)
+  if (!market) return { ok: false, reason: 'market_unavailable' }
+  if (db.prepare('SELECT 1 FROM user WHERE email = ? COLLATE NOCASE').get(normalizedEmail)) return { ok: false, reason: 'email_in_use' }
+
+  const passwordHash = await hashPassword(password)
+  const user: SessionUser = { id: `merchant-${randomUUID()}`, email: normalizedEmail, role: 'merchant', marketId }
+  try {
+    db.prepare('INSERT INTO user (id, email, password_hash, role, market_id) VALUES (?, ?, ?, ?, ?)')
+      .run(user.id, user.email, passwordHash, user.role, user.marketId)
+    return { ok: true, user }
+  } catch (error) {
+    if ((error as { code?: string })?.code === 'SQLITE_CONSTRAINT_UNIQUE') return { ok: false, reason: 'email_in_use' }
+    throw error
+  }
 }
 
 /** Hashing primitive for API-key provisioning; the raw key must never be persisted. */

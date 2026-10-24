@@ -77,6 +77,33 @@
 .resultsMeta { display: flex; align-items: center; gap: 18px; color: #718073; font-size: 11px; }
 .verifiedCount { display: flex; align-items: center; gap: 8px; color: #4e7247; font-weight: 750; }
 .verifiedCount i { width: 6px; height: 6px; background: #6da65d; box-shadow: none; }
+.productList { display: flex; flex-direction: column; gap: 8px; }
+.productRow { display: flex; align-items: center; gap: 14px; width: 100%; min-width: 0; min-height: 82px; padding: 11px 14px; border: 1px solid #dce5d8; border-radius: 11px; background: #fff; color: var(--ink); text-align: left; cursor: pointer; transition: border-color .16s ease, background .16s ease, box-shadow .16s ease; }
+.productRow:hover { border-color: #a7bf96; background: #f9fbf6; box-shadow: 0 5px 16px rgba(29, 58, 38, .06); }
+.productRow:focus-visible, .pageButton:focus-visible { outline: 3px solid #68944d; outline-offset: 2px; }
+.productRowSelected { border-color: #4b7c42; background: #f3f8ed; box-shadow: inset 0 0 0 1px #4b7c42; }
+.productImageWrap { position: relative; display: grid; flex: 0 0 58px; place-items: center; width: 58px; height: 58px; overflow: hidden; border: 1px solid #e3eadb; border-radius: 9px; background: #f1f5e9; }
+.productImageFallback { color: #607f4e; font-size: 27px; font-weight: 800; }
+.productImage { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #fff; }
+.productRowInfo { display: grid; flex: 1; gap: 4px; min-width: 0; }
+.productRowInfo strong { overflow: hidden; color: var(--ink); font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.productRowInfo > span:last-child { overflow: hidden; color: #6f7f72; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.productCategory { color: #6b8b57; font-size: 9px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; }
+.productRowAction { display: flex; align-items: center; gap: 5px; color: #4e7247; font-size: 10px; font-weight: 800; white-space: nowrap; }
+.productRowAction > span { font-size: 16px; }
+.pagination { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 20px 0 30px; color: #627569; font-size: 12px; }
+.pageButton { min-height: 38px; padding: 0 14px; border: 1px solid #d9e3d4; border-radius: 8px; background: #fff; color: #31523b; font: inherit; font-weight: 700; cursor: pointer; }
+.pageButton:hover:not(:disabled) { border-color: #91ad80; background: #f4f8ef; }
+.pageButton:disabled { color: #aab4aa; cursor: not-allowed; }
+.comparisonPanel { margin-top: 42px; }
+.table thead { background: #eaf0e6; }
+.table thead th { color: #455d49; }
+.table tbody tr { background: #fff; }
+.table tbody tr:hover { background: #f5f8f1; }
+.table tbody td { border-top: 1px solid #e7ece3; }
+.productCell .productImageWrap { flex-basis: 42px; width: 42px; height: 42px; border-radius: 9px; }
+.productCell .productImageFallback { font-size: 17px; }
+.noPrice { color: #64756a; font-size: 11px; }
 .tableFrame { overflow: hidden; border: 1px solid #e2e8dd; border-radius: 15px; background: #fff; box-shadow: 0 12px 30px rgba(29, 58, 38, .035); }
 .tableScroll { overflow-x: auto; }
 .table { width: 100%; min-width: 900px; border-collapse: collapse; text-align: left; }
@@ -154,6 +181,15 @@
   .resultsBar h3 { font-size: 18px; }
   .resultsMeta { flex-direction: column; align-items: end; gap: 5px; font-size: 9px; }
   .verifiedCount { gap: 6px; }
+  .productRow { gap: 10px; min-height: 72px; padding: 9px 10px; }
+  .productImageWrap { flex-basis: 50px; width: 50px; height: 50px; }
+  .productImageFallback { font-size: 22px; }
+  .productRowInfo strong { font-size: 12px; }
+  .productRowInfo > span:last-child { font-size: 9px; }
+  .productRowAction { font-size: 9px; }
+  .pagination { gap: 9px; font-size: 10px; }
+  .pageButton { min-height: 35px; padding: 0 10px; font-size: 10px; }
+  .comparisonPanel { margin-top: 32px; }
   .table { min-width: 800px; }
   .table thead th { min-width: 135px; padding: 13px 12px; font-size: 8px; }
   .table thead .productHeader { min-width: 180px; }

@@ -40,16 +40,14 @@ escrita do lojista (SM-04/SM-05) se perde no próximo cold start. Por isso:
 3. Montar o disco em `/data` (o blueprint já declara `mountPath: /data`).
 4. Definir `SESSION_SECRET` (Environment → Secret).
 5. Deploy. Healthcheck em `/` deve responder `200`.
-6. Semear o banco do ambiente publicado (uma vez):
+6. Configure `DATABASE_PATH=/data/app.db`. O `prestart` executa `db:bootstrap`, que preenche apenas um catálogo vazio e preserva dados nas reinicializações.
 
    ```bash
    # a partir da máquina local, apontando para o banco do host
-   DATABASE_PATH=/data/app.db npm run db:reset
+   DATABASE_PATH=/data/app.db npm run db:bootstrap
    ```
 
-   > Alternativa sem shell: rodar o seed no start do container
-   > (`npm run db:reset && npm start`) enquanto o banco não existir. Evitar
-   > depois da demo começar — o reset apaga os preços.
+   > `npm run db:reset` é destrutivo e deve ser usado somente em desenvolvimento.
 
 ## Fly.io — resumo
 
@@ -89,7 +87,8 @@ Válido para a apresentação; registrar no roteiro qual link será usado.
 
 ## Checklist antes de publicar
 
-- [ ] `npm run db:reset` (seed com 3 mercados e preço vencido — SEED-01/02)
+- [ ] `npm run db:bootstrap` (preenche catálogo vazio)
+- [ ] `npm run db:reset` somente em desenvolvimento, quando fixtures forem necessárias
 - [ ] `npm test` verde
 - [ ] `npm run typecheck` verde
 - [ ] `npm run build` verde
