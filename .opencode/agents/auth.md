@@ -22,7 +22,7 @@ permissions:
     resource: "lib/api-key*"
     effect: allow
   - action: edit
-    resource: "middleware.ts"
+    resource: "proxy.ts"
     effect: allow
   - action: edit
     resource: "tests/auth*"

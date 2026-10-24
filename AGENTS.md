@@ -23,7 +23,7 @@ Um agente integrador + três agentes de fluxo, espelhando o plano da seção 10 
 | **Integrador** | `package.json`, lockfile, `tsconfig`, `next.config`, `app/layout.tsx`, `db/schema.sql`, `docs/api.md`, deploy | features de fluxo |
 | **Backend/Dados** | `app/api/**`, `lib/db.ts`, `lib/prices.ts`, `db/seed.*` | UI, auth, `package.json` |
 | **Frontend consumidor** | `app/(public)/**`, `components/consumer/**` | `lib/**`, API, auth |
-| **Auth/Lojista** | `app/(merchant)/**`, `lib/auth.ts`, `middleware.ts`, `components/merchant/**` | `lib/prices.ts`, API pública |
+| **Auth/Lojista** | `app/(merchant)/**`, `lib/auth.ts`, `proxy.ts`, `components/merchant/**` | `lib/prices.ts`, API pública |
 
 Regras:
 - **Um dono por caminho.** Não edite arquivo de outro papel; peça a mudança ao dono.

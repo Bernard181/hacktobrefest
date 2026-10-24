@@ -35,7 +35,7 @@ export function getProductOffers(productId: string, city = 'Rio Branco', marketI
 const globalForDb = globalThis as typeof globalThis & { compraFacilDb?: Database.Database }
 
 function createDatabase() {
-  const filename = process.env.DB_PATH ?? path.join(process.cwd(), 'data', 'comprafacil.sqlite')
+  const filename = process.env.DB_PATH ?? process.env.DATABASE_PATH ?? path.join(process.cwd(), 'data', 'comprafacil.sqlite')
   if (filename !== ':memory:') fs.mkdirSync(path.dirname(filename), { recursive: true })
   const db = new Database(filename)
   db.pragma('foreign_keys = ON')
@@ -46,15 +46,4 @@ function createDatabase() {
 
 export function getDb() {
   return (globalForDb.compraFacilDb ??= createDatabase())
-}
-
-export function resetDb() {
-  if (globalForDb.compraFacilDb) globalForDb.compraFacilDb.close()
-  delete globalForDb.compraFacilDb
-  const filename = process.env.DB_PATH ?? path.join(process.cwd(), 'data', 'comprafacil.sqlite')
-  if (filename !== ':memory:') {
-    fs.mkdirSync(path.dirname(filename), { recursive: true })
-    if (fs.existsSync(filename)) fs.rmSync(filename)
-  }
-  return getDb()
 }
