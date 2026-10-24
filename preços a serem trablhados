@@ -1,19 +1,40 @@
-esses preços serão a base do sistema e vao ser ultilizados no 
-tabela de preços 
-mercado 1: arasuper: 
-1 arroz, brilhante 5kg preço 27,99
-2 Feijao, marca: dona de   1kg preço 7,59
-3 açucar,marca: itamarati, 1kg preço 3,09
-4 café, marca: vovo pureza, 250g 13,99
-5 farinha, de trigo campesina, 1kg, 5,59
+# Comparação de preços — Rio Branco/AC
 
-esses dados serão ultilizados no sistema como produtos basicos catlagados e depois os preços serem comparados 
-tabele deve ser esalizada se baseando e preço mercado quantidade e produto usando as informaçoes fornecidas
+Esta é a base inicial do catálogo de produtos e da comparação de preços do sistema. Os valores foram fornecidos como preços reais para os mercados Arasuper e Assaí e mantidos como recebidos. A fonte não informa data de coleta nem endereço das lojas; esses campos não são presumidos. Para exibir os valores como atuais, o sistema deve registrar a data em que cada mercado os informou.
 
+## Comparativo por produto
 
-mercado 2: asaí
-1 arroz, brilhante 5kg preço 23,49
-2 farinha de trigo campesina 1kg, preço 3,49
-3 café vovo pureza 250g preço 12,49
-4 feijao dona de 1kg preço 6,65
-5 açucar,marca: itamarati, 1kg preço 2,49
+| Produto | Quantidade | Arasuper | Assaí | Diferença | Menor preço informado |
+|---|---:|---:|---:|---:|---|
+| Arroz Brilhante | 5 kg | R$ 27,99 | R$ 23,49 | R$ 4,50 | Assaí |
+| Feijão Dona de | 1 kg | R$ 7,59 | R$ 6,65 | R$ 0,94 | Assaí |
+| Açúcar Itamarati | 1 kg | R$ 3,09 | R$ 2,49 | R$ 0,60 | Assaí |
+| Café Vovó Pureza | 250 g | R$ 13,99 | R$ 12,49 | R$ 1,50 | Assaí |
+| Farinha de trigo Campesina | 1 kg | R$ 5,59 | R$ 3,49 | R$ 2,10 | Assaí |
+| **Total dos cinco itens** |  | **R$ 58,25** | **R$ 48,61** | **R$ 9,64** | **Assaí** |
+
+A diferença é calculada entre o preço do Arasuper e o do Assaí. Os produtos só devem ser comparados quando nome/marca e quantidade corresponderem.
+
+## Dados para o sistema
+
+Os cinco itens da tabela são os produtos básicos catalogados inicialmente. Cada linha representa um produto comparável, identificado por nome/marca e quantidade, e um preço por mercado. No banco, o produto deve guardar nome, categoria e unidade; cada preço deve guardar `product_id`, `market_id`, valor em centavos, data da coleta e fonte. Assim, por exemplo, R$ 23,49 é armazenado como `2349`, sem arredondamento de ponto flutuante.
+
+Os nomes e preços são a base fornecida para o sistema. A lista não informa categoria, endereço dos mercados nem data de coleta; esses campos precisam ser fornecidos pelo mercado ou cadastrados antes de aparecerem no sistema. Não deduza endereço pelo nome da rede.
+
+## Como o sistema funciona
+
+1. **Catálogo:** o backend mantém um produto por combinação comparável de descrição, marca e quantidade. Produtos com unidades diferentes ficam separados.
+2. **Entrada de preços:** o lojista informa o valor e a data pelo painel. A integração futura por PDV envia os mesmos dados à API autenticada por chave da loja.
+3. **Persistência:** o backend valida valor e data, associa o preço ao mercado correto e grava um novo registro. A atualização preserva o registro anterior para manter histórico.
+4. **Consulta:** a API pública retorna os produtos, mercados e preços em JSON. O backend considera atual um preço coletado nos últimos 30 dias; preços mais antigos podem continuar visíveis com aviso, mas não vencem a comparação.
+5. **Comparação na tela:** o frontend consulta os preços, agrupa ofertas do mesmo produto/unidade e organiza os mercados em colunas. Mostra o menor preço, a diferença, mercado e data de coleta; em celular, a tabela pode rolar horizontalmente ou virar cartões.
+
+### Exemplo de consulta
+
+```http
+GET /api/v1/prices?product_id=<id-do-produto>&city=Rio%20Branco
+```
+
+A resposta deve fornecer, para cada oferta, o produto/unidade, valor, mercado, endereço e data de coleta, além de um indicador de validade. A tabela da interface é montada com esses campos recebidos; não deve substituir dados ausentes por informação inventada.
+
+> O repositório ainda não contém frontend, backend ou API. Este arquivo organiza os dados e descreve como eles se encaixam no sistema definido em `REQUISITOS.md`; ainda não existe uma aba de preços implementada para alterar.
