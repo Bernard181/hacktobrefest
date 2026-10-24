@@ -34,6 +34,7 @@
 .heroButton > span { font-size: 18px; }
 .heroVisual { position: relative; display: grid; place-items: center; min-height: 245px; }
 .orbit { position: absolute; width: 290px; height: 290px; border: 1px solid rgba(216, 242, 199, .14); border-radius: 50%; }
+.orbitOne { transform: rotate(18deg); }
 .orbitTwo { width: 220px; height: 220px; border-color: rgba(216, 242, 199, .12); }
 .receipt { position: relative; z-index: 1; width: 235px; padding: 20px 20px 14px; transform: rotate(4deg); border-radius: 3px 3px 13px 13px; background: #f9f8ef; box-shadow: 0 22px 50px rgba(0, 0, 0, .22); color: #193c2e; }
 .receipt::after { position: absolute; right: 0; bottom: -8px; left: 0; height: 9px; background: linear-gradient(135deg, #f9f8ef 50%, transparent 50%) 0 0 / 12px 12px repeat-x; content: ''; }
@@ -134,7 +135,7 @@
   .hero h1 { margin-top: 19px; font-size: clamp(47px, 14vw, 66px); letter-spacing: -3.3px; }
   .heroCopy > p { max-width: 320px; font-size: 13px; }
   .heroButton { margin-top: 19px; padding: 12px 14px; font-size: 11px; }
-  .heroVisual { position: absolute; right: -78px; bottom: 35px; width: 215px; min-height: 185px; transform: scale(.72); transform-origin: center right; opacity: .86; }
+  .heroVisual { display: none; }
   .heroBadge, .heroSparkle { display: none; }
   .heroBottom { right: 24px; bottom: 18px; left: 24px; font-size: 7px; letter-spacing: .8px; }
   .sectionHeading { align-items: start; }
