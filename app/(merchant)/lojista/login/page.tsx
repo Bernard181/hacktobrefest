@@ -1,29 +1,69 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+
+import { LoginForm } from "@/components/merchant/LoginForm";
+import { getSessionUser } from "@/lib/auth";
+
+import { normalizeNextPath } from "../merchant";
 
 /**
  * Login do lojista: "/lojista/login" (RF06).
- * DONO: agente Auth/Lojista. Este arquivo e o placeholder da fase 0.
+ * DONO: agente Auth/Lojista.
  */
 export const metadata: Metadata = { title: "Entrar — Área do lojista" };
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
-export default function MerchantLoginPage() {
+export default async function MerchantLoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string | string[] }>;
+}) {
+  if (await getSessionUser()) redirect("/lojista");
+
+  const params = await searchParams;
+  const nextBruto = Array.isArray(params.next) ? params.next[0] : params.next;
+  const nextPath = normalizeNextPath(nextBruto);
+
   return (
     <>
-      <h1>Entrar</h1>
-      <p className="muted">Acesso exclusivo para lojistas cadastrados.</p>
+      <h1>Entrar — Área do lojista</h1>
+      <p className="muted">
+        Acesso exclusivo para lojistas cadastrados. Cada conta gerencia somente
+        o próprio mercado.
+      </p>
 
-      <section className="card pending">
-        <h2>Formulário ainda não existe</h2>
-        <p>
-          O scaffold não inclui autenticação. O formulário de e-mail e senha
-          entra na issue <code>feat(auth): login do lojista e sessão</code>,
-          junto com <code>lib/auth.ts</code> e <code>middleware.ts</code>.
+      <LoginForm nextPath={nextPath} />
+
+      <section
+        className="card"
+        aria-label="Acesso de demonstração"
+        style={{ borderLeft: "3px solid var(--warn)" }}
+      >
+        <h2 style={{ marginTop: 0 }}>
+          Acesso de demonstração{" "}
+          <span className="badge badge--warn">dados fictícios</span>
+        </h2>
+        <p className="muted" style={{ marginTop: 0 }}>
+          Contas semeadas para a apresentação. Os preços são de demonstração.
         </p>
-        <p>
-          <Link href="/lojista">Voltar</Link>
-        </p>
+        <ul style={{ margin: 0, paddingLeft: 20 }}>
+          <li>
+            <strong>Mercado Centro</strong> — <code>centro@demo.local</code>
+          </li>
+          <li>
+            <strong>Mercado Bosque</strong> — <code>bosque@demo.local</code>
+          </li>
+          <li>
+            Senha das duas contas: <code>demo1234</code>
+          </li>
+        </ul>
       </section>
+
+      <p>
+        <Link href="/">Voltar para a busca do consumidor</Link>
+      </p>
     </>
   );
 }
