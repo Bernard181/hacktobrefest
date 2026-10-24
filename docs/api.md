@@ -14,15 +14,15 @@ O schema em `db/schema.sql` é a fonte de verdade. IDs são strings estáveis. D
 - Produto: `{ "id": string, "name": string, "brand": string, "category": string, "unit": string }`.
 - Sem resultados: `200 { "items": [] }`.
 
-## GET /api/v1/markets?city=
+## GET /api/v1/markets?state=
 
-- Público, JSON, CORS `*`; cidade omitida significa Rio Branco.
+- Público, JSON, CORS `*`; `state` omitido significa `AC`, e a consulta abrange os municípios desse estado. Mercados preservam sua cidade cadastrada; cobertura estadual não presume filiais ou endereços.
 - `200`: `{ "items": Market[] }`.
-- Mercado: `{ "id": string, "name": string, "address": string | null, "neighborhood": string | null, "city": string, "demo": boolean }`.
+- Mercado: `{ "id": string, "name": string, "address": string | null, "neighborhood": string | null, "city": string, "state": string, "demo": boolean }`.
 
-## GET /api/v1/prices?product_id=&city=
+## GET /api/v1/prices?product_id=&state=
 
-- Público, JSON, CORS `*`; `product_id` é obrigatório; cidade omitida significa Rio Branco.
+- Público, JSON, CORS `*`; `product_id` é obrigatório; `state` omitido significa `AC` e filtra as ofertas de todo o estado.
 - `200`: `{ "product": Product, "offers": Offer[] }`; produto inexistente: `404 { "error": "Produto não encontrado" }`.
 - Oferta: `{ "id": string, "market": Market, "price_cents": number, "collected_at": string | null, "verified": boolean, "valid": boolean, "ranked": boolean, "source": "painel" | "api" | "seed" }`. Uma coleta enviada por lojista autenticado recebe `verified: true`.
 - A resposta inclui o registro mais recentemente inserido para cada mercado. O histórico completo permanece append-only no banco; esta rota compara a oferta atual de cada mercado.
@@ -53,4 +53,4 @@ Rotas privadas do painel:
 
 ## Seed e demonstração
 
-Os preços fornecidos para Arasuper e Assaí são incluídos com `verified: true` e `collected_at: null`: foram confirmados como dados reais pelo usuário, mas não têm data de coleta, portanto não aparecem como atuais/rankeados. Endereços não são presumidos. Fixtures com endereços/dados fictícios dos testes precisam ser marcadas `demo: true` e claramente rotuladas na interface.
+Os preços fornecidos para Arasuper e Assaí são incluídos com `verified: true` e `collected_at: 2026-10-24`, data de coleta informada pelo usuário. A API permite consultar todos os municípios do Acre (`state=AC`). Os dois mercados-base estão cadastrados em Rio Branco, pois não foram informados outros municípios nem endereços; cobertura estadual não significa que existam filiais cadastradas em todo o estado. Fixtures com endereços/dados fictícios dos testes precisam ser marcadas `demo: true` e claramente rotuladas na interface.

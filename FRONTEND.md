@@ -1,6 +1,6 @@
 # Frontend — tabela comparativa de preços
 
-Esta especificação descreve a tela pública de preços do MVP em Rio Branco/AC. Ela consome a API definida em `BACKEND.md`. A comparação abaixo organiza os valores fornecidos para os mesmos produtos e quantidades nos mercados Arasuper e Assaí. Como a fonte não trouxe datas de coleta, os preços são valores informados e a validade ainda não pode ser confirmada.
+Esta especificação descreve a tela pública de preços do MVP no Acre/AC. Ela consome a API definida em `BACKEND.md`. A comparação abaixo organiza os valores fornecidos para os mesmos produtos e quantidades nos mercados Arasuper e Assaí. A coleta informada para os dez preços-base ocorreu em 24/10/2026. A consulta é estadual; cidade/endereço são exibidos apenas quando cadastrados.
 
 ## 1. Tabela de comparação
 
@@ -13,7 +13,7 @@ Esta especificação descreve a tela pública de preços do MVP em Rio Branco/AC
 | Farinha de trigo Campesina | 1 kg | R$ 5,59 | R$ 3,49 | R$ 2,10 | Assaí |
 | **Cesta com os cinco itens** |  | **R$ 58,25** | **R$ 48,61** | **R$ 9,64** | **Assaí** |
 
-A diferença é Arasuper menos Assaí. O menor valor nesta tabela é apenas o menor preço entre os dados recebidos; não deve ser rotulado como oferta atual até a data de coleta ser cadastrada e validada pelo backend.
+A diferença é Arasuper menos Assaí. O menor valor nesta tabela é apenas o menor preço entre os dados recebidos; pode ser destacado como menor preço atual somente se `ranked: true` na resposta do backend.
 
 ## 2. Colunas e apresentação
 
@@ -49,7 +49,7 @@ A diferença é Arasuper menos Assaí. O menor valor nesta tabela é apenas o me
 
 ## 5. Fluxo de funcionamento
 
-1. A tela chama `GET /api/v1/products` para catálogo/busca e `GET /api/v1/prices?product_id=...&city=Rio%20Branco` para ofertas.
+1. A tela chama `GET /api/v1/products` para catálogo/busca e `GET /api/v1/prices?product_id=...&state=AC` para ofertas.
 2. A API devolve preço inteiro em centavos, nome/endereço do mercado, data de coleta e indicadores `valid`/`ranked`.
 3. O frontend formata os valores em reais e renderiza uma coluna por mercado.
 4. O backend determina validade e ranking segundo as regras de 30 dias; o frontend apresenta os estados e não redefine essas regras.

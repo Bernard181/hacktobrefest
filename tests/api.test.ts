@@ -43,11 +43,11 @@ describe('API pública (contrato v1)', () => {
     const json = await response.json()
     expect(json.offers[0]).toMatchObject({ price_cents: 2750, market: { id: 'M2', address: 'Rua B, 200 — Bosque, Rio Branco/AC' }, collected_at: '2026-10-23' })
   })
-  it('API-15 separa verificação da atualidade do preço informado', async () => {
+  it('API-15 distingue dados confirmados de preços atuais, com coleta informada', async () => {
     const response = await pricesGET(req('/api/v1/prices?product_id=arroz-brilhante-5kg'))
     const offers = (await response.json()).offers
-    expect(offers.find((offer: any) => offer.market.id === 'arasuper')).toMatchObject({ verified: true, collected_at: null, valid: false, ranked: false })
-    expect(offers.find((offer: any) => offer.market.id === 'assai')).toMatchObject({ verified: true, collected_at: null, valid: false, ranked: false })
+    expect(offers.find((offer: any) => offer.market.id === 'arasuper')).toMatchObject({ verified: true, collected_at: '2026-10-24', valid: true, ranked: true, market: { state: 'AC' } })
+    expect(offers.find((offer: any) => offer.market.id === 'assai')).toMatchObject({ verified: true, collected_at: '2026-10-24', valid: true, ranked: true, market: { state: 'AC' } })
   })
   it('API-04 inclui vencido sinalizado e fora do ranking', async () => {
     const response = await pricesGET(req('/api/v1/prices?product_id=P1'))
@@ -59,6 +59,18 @@ describe('API pública (contrato v1)', () => {
   it('API-08 lista mercados com endereço e cidade', async () => {
     const items = (await (await marketsGET(req('/api/v1/markets'))).json()).items
     expect(items.find((item: any) => item.id === 'M1')).toMatchObject({ name: 'Mercado Centro', city: 'Rio Branco', demo: true })
+  })
+  it('API-17 filtra mercados e preços por todo o estado informado', async () => {
+    getDb().prepare("INSERT INTO market (id,name,city,state,active,demo) VALUES ('market-cruzeiro','Mercado de Cruzeiro do Sul','Cruzeiro do Sul','AC',1,0)").run()
+    getDb().prepare("INSERT INTO market (id,name,city,state,active,demo) VALUES ('market-outside-ac','Mercado fora do Acre','São Paulo','SP',1,0)").run()
+    getDb().prepare("INSERT INTO price (id,market_id,product_id,value_cents,collected_at,source,verified) VALUES ('acre-price','market-cruzeiro','arroz-brilhante-5kg',2400,'2026-10-24','seed',1)").run()
+    getDb().prepare("INSERT INTO price (id,market_id,product_id,value_cents,collected_at,source,verified) VALUES ('outside-ac-price','market-outside-ac','arroz-brilhante-5kg',2300,'2026-10-24','seed',1)").run()
+    const markets = (await (await marketsGET(req('/api/v1/markets?state=AC'))).json()).items
+    const offers = (await (await pricesGET(req('/api/v1/prices?product_id=arroz-brilhante-5kg&state=AC'))).json()).offers
+    expect(markets.some((market: any) => market.city === 'Cruzeiro do Sul' && market.state === 'AC')).toBe(true)
+    expect(markets.some((market: any) => market.id === 'market-outside-ac')).toBe(false)
+    expect(offers.some((offer: any) => offer.market.id === 'market-cruzeiro')).toBe(true)
+    expect(offers.some((offer: any) => offer.market.id === 'market-outside-ac')).toBe(false)
   })
   it('API-09 rejeita query ausente/malformada sem erro interno', async () => {
     expect((await pricesGET(req('/api/v1/prices'))).status).toBe(400)
@@ -112,6 +124,14 @@ describe('API de lojista', () => {
     authState.user = { id: 'user-m1', email: 'merchant@example.test', role: 'merchant', marketId: null }
     expect((await merchantPOST(postReq('/api/merchant/prices', { product_id: 'P1', value_cents: 1000, collected_at: '2026-10-24' }))).status).toBe(403)
   })
+  it('GET de lojista filtra pela UF do mercado vinculado à sessão', async () => {
+    getDb().prepare("INSERT INTO market (id,name,city,state,active,demo) VALUES ('merchant-sp','Mercado SP','São Paulo','SP',1,0)").run()
+    getDb().prepare("INSERT INTO price (id,market_id,product_id,value_cents,collected_at,source,verified) VALUES ('merchant-sp-price','merchant-sp','P1',3000,'2026-10-24','painel',1)").run()
+    authState.user = { id: 'merchant-sp-user', email: 'merchant-sp@example.test', role: 'merchant', marketId: 'merchant-sp' }
+    const items = (await (await merchantGET()).json()).items
+    expect(items).toHaveLength(1)
+    expect(items[0].market).toMatchObject({ id: 'merchant-sp', state: 'SP' })
+  })
 })
 
 describe('integridade do seed', () => {
@@ -135,7 +155,7 @@ describe('integridade do seed', () => {
     expect(rows.every((row) => Number.isInteger(row.value_cents) && row.value_cents > 0 && (!row.collected_at || row.collected_at <= '2026-10-24'))).toBe(true)
   })
   it('SEED-05 marca como verificados os dez preços fornecidos para os mercados reais', () => {
-    const rows = getDb().prepare("SELECT COUNT(*) AS count FROM price WHERE id LIKE 'real-%' AND verified=1 AND collected_at IS NULL").get() as any
+    const rows = getDb().prepare("SELECT COUNT(*) AS count FROM price WHERE id LIKE 'real-%' AND verified=1 AND collected_at='2026-10-24'").get() as any
     expect(rows.count).toBe(10)
   })
   it('SM-04 cria usuário de demonstração com senha apenas como hash e vínculo Arasuper', () => {

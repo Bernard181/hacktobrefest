@@ -9,15 +9,15 @@ export async function seedDatabase() {
   const db = getDb()
   const seed = db.transaction(() => {
   db.exec('DELETE FROM price; DELETE FROM user; DELETE FROM product; DELETE FROM market;')
-  const market = db.prepare('INSERT INTO market (id,name,address,neighborhood,city,active,demo) VALUES (?,?,?,?,?,?,?)')
-  market.run('arasuper', 'Arasuper', null, null, 'Rio Branco', 1, 0)
-  market.run('assai', 'Assaí', null, null, 'Rio Branco', 1, 0)
+  const market = db.prepare('INSERT INTO market (id,name,address,neighborhood,city,state,active,demo) VALUES (?,?,?,?,?,?,?,?)')
+  market.run('arasuper', 'Arasuper', null, null, 'Rio Branco', 'AC', 1, 0)
+  market.run('assai', 'Assaí', null, null, 'Rio Branco', 'AC', 1, 0)
   const demoMarkets = [
     ['M1', 'Mercado Centro', 'Rua A, 100', 'Centro'],
     ['M2', 'Mercado Bosque', 'Rua B, 200', 'Bosque'],
     ['M3', 'Mercado Floresta', 'Rua C, 300', 'Floresta'],
   ]
-  for (const [id, name, address, neighborhood] of demoMarkets) market.run(id, name, `${address} — ${neighborhood}, Rio Branco/AC`, neighborhood, 'Rio Branco', 1, 1)
+  for (const [id, name, address, neighborhood] of demoMarkets) market.run(id, name, `${address} — ${neighborhood}, Rio Branco/AC`, neighborhood, 'Rio Branco', 'AC', 1, 1)
 
   db.prepare('INSERT INTO user (id,email,password_hash,role,market_id) VALUES (?,?,?,?,?)')
     .run('merchant-arasuper', 'lojista@comprafacil.local', passwordHash, 'merchant', 'arasuper')
@@ -42,7 +42,7 @@ export async function seedDatabase() {
     ['arroz-brilhante-5kg', 'arasuper', 2799], ['feijao-dona-de-1kg', 'arasuper', 759], ['acucar-itamarati-1kg', 'arasuper', 309], ['cafe-vovo-pureza-250g', 'arasuper', 1399], ['farinha-campesina-1kg', 'arasuper', 559],
     ['arroz-brilhante-5kg', 'assai', 2349], ['farinha-campesina-1kg', 'assai', 349], ['cafe-vovo-pureza-250g', 'assai', 1249], ['feijao-dona-de-1kg', 'assai', 665], ['acucar-itamarati-1kg', 'assai', 249],
   ]
-  realPrices.forEach(([productId, marketId, cents], index) => price.run(`real-${index + 1}`, marketId, productId, cents, null, 'seed', 1))
+  realPrices.forEach(([productId, marketId, cents], index) => price.run(`real-${index + 1}`, marketId, productId, cents, '2026-10-24', 'seed', 1))
   const fixtures: [string, string, number, string][] = [
     ['P1', 'M1', 2890, '2026-10-24'], ['P1', 'M2', 2750, '2026-10-23'], ['P1', 'M3', 2650, '2026-09-20'],
     ['P4', 'M1', 1990, '2026-10-20'], ['P4', 'M2', 1990, '2026-10-22'],
@@ -51,7 +51,7 @@ export async function seedDatabase() {
   fixtures.forEach(([productId, marketId, cents, collected], index) => price.run(`demo-${index + 1}`, marketId, productId, cents, collected, 'seed', 0))
   })
   seed()
-  console.log('Banco inicializado com catálogo real sem data de coleta e fixtures de demonstração.')
+  console.log('Banco inicializado com catálogo real coletado em 2026-10-24 e fixtures de demonstração.')
 }
 
 // tsx executes this file as CommonJS in the current package configuration.

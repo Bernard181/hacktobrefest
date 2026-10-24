@@ -115,11 +115,11 @@ describe('RN01 — validade de 30 dias', () => {
 
 | ID | Cenário | Esperado | Pri |
 |---|---|---|---|
-| SEED-01 | Após `db:reset` | 3 mercados ativos em Rio Branco, com nome e endereço | P0 |
+| SEED-01 | Após `db:reset` | 3 mercados fictícios ativos em Rio Branco, todos com `state=AC` | P0 |
 | SEED-02 | Fixture do P1 | preço em M1, M2 e M3; exatamente um com mais de 30 dias | P0 |
 | SEED-03 | Fixture do P4 | dois preços iguais em mercados distintos, com datas diferentes | P1 |
 | SEED-04 | Sanidade dos preços | nenhuma `data_coleta` futura; todo valor inteiro > 0 | P0 |
-| SEED-05 | Preços reais informados | os 10 valores Arasuper/Assaí têm `verified=1`, sem data de coleta inventada | P0 |
+| SEED-05 | Preços reais informados | os 10 valores Arasuper/Assaí têm `verified=1` e `collected_at=2026-10-24` | P0 |
 
 ## 5. Casos de API (integração)
 
@@ -132,10 +132,11 @@ describe('RN01 — validade de 30 dias', () => {
 | API-05 | `product_id` inexistente | resposta consistente (`404` ou `[]`), documentada | RF12 | P1 |
 | API-06 | Qualquer GET público | header CORS presente | RF14 | P0 |
 | API-07 | GET sem credencial | responde `200` | RF14, RF05 | P0 |
-| API-08 | `GET /api/v1/markets` | mercados de Rio Branco com nome/endereço | RF13 | P1 |
+| API-08 | `GET /api/v1/markets` | mercados do Acre com `state=AC`, nome e cidade cadastrada | RF13 | P1 |
 | API-09 | Query inválida (`category` vazia, `product_id` malformado) | `400` ou lista vazia, nunca `500` | RF11/RF12 | P1 |
-| API-15 | Preço confirmado sem data | `verified: true` aparece separado de `valid: false` e `ranked: false` | RF12, RN01 | P0 |
+| API-15 | Preços-base confirmados e datados | os 10 preços mostram coleta 2026-10-24 e ficam válidos/rankeados dentro dos 30 dias | RF12, RN01 | P0 |
 | API-16 | Atualização autenticada pelo lojista | registro novo recebe `verified: true` e a coleta informada | RF08, RN06 | P0 |
+| API-17 | Filtro estadual `state=AC` | mercados e preços de qualquer município do Acre cadastrado são incluídos | RF13 | P0 |
 | API-10 | `POST /api/v1/prices` sem `X-API-Key` | `401` | RF15 | P2 |
 | API-11 | POST com chave de outro mercado | `403` | RF15, RN07 | P2 |
 | API-12 | POST válido | `201`; preço aparece no GET | RF15 | P2 |

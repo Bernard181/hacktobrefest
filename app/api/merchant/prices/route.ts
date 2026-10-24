@@ -13,12 +13,14 @@ export async function GET() {
   if (auth.response) return auth.response
   const marketId = auth.user!.marketId
   if (!marketId) return json({ error: 'Vínculo de mercado obrigatório' }, 403)
+  const market = getDb().prepare('SELECT state FROM market WHERE id=? AND active=1').get(marketId) as { state: string } | undefined
+  if (!market) return json({ error: 'Mercado não encontrado' }, 403)
   const products = getDb().prepare('SELECT DISTINCT product_id FROM price WHERE market_id=?').all(marketId) as { product_id: string }[]
   const items = products.flatMap(({ product_id }) => {
     const p = getDb().prepare('SELECT id,name,brand,category,unit FROM product WHERE id=?').get(product_id)
     if (!p) return []
     const product = productRow(p)
-    return getProductOffers(product_id, 'Rio Branco', marketId).map((offer) => ({ ...offer, product }))
+    return getProductOffers(product_id, market.state, marketId).map((offer) => ({ ...offer, product }))
   })
   return json({ items })
 }

@@ -6,12 +6,15 @@ import styles from './consumer.module.css'
 import { priceDifferenceCents } from './comparison'
 
 type Product = { id: string; name: string; brand: string; category: string; unit: string }
-type Market = { id: string; name: string; address: string | null; neighborhood: string | null; city: string; demo: boolean }
+type Market = { id: string; name: string; address: string | null; neighborhood: string | null; city: string; state: string; demo: boolean }
 type Offer = { id: string; market: Market; price_cents: number; collected_at: string | null; verified: boolean; valid: boolean; ranked: boolean; source: 'painel' | 'api' | 'seed' }
 type PriceResponse = { product: Product; offers: Offer[] }
 
 const money = (cents: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cents / 100)
-const date = (value: string | null) => value ? new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeZone: 'UTC' }).format(new Date(`${value.slice(0, 10)}T00:00:00Z`)) : 'Data não informada'
+const date = (value: string | null) => value ? new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${value.slice(0, 10)}T00:00:00Z`)) : 'Data não informada'
+const marketLocation = (market: Market) => market.address
+  ? [market.address, market.neighborhood, market.city, market.state].filter(Boolean).join(' · ')
+  : [market.city, market.state].filter(Boolean).join(', ')
 
 export function ConsumerSearch() {
   const [query, setQuery] = useState('')
@@ -33,7 +36,7 @@ export function ConsumerSearch() {
         if (category) params.set('category', category)
         const [productResponse, marketResponse] = await Promise.all([
           fetch(`/api/v1/products${params.size ? `?${params}` : ''}`, { signal: controller.signal }),
-          fetch('/api/v1/markets?city=Rio%20Branco', { signal: controller.signal }),
+          fetch('/api/v1/markets?state=AC', { signal: controller.signal }),
         ])
         if (!productResponse.ok || !marketResponse.ok) throw new Error('Não foi possível carregar os dados. Tente novamente.')
         const productData = await productResponse.json() as { items: Product[] }
@@ -41,7 +44,7 @@ export function ConsumerSearch() {
         setProducts(productData.items)
         setMarkets(marketData.items)
         const results = await Promise.all(productData.items.map(async product => {
-          const response = await fetch(`/api/v1/prices?product_id=${encodeURIComponent(product.id)}&city=Rio%20Branco`, { signal: controller.signal })
+          const response = await fetch(`/api/v1/prices?product_id=${encodeURIComponent(product.id)}&state=AC`, { signal: controller.signal })
           if (!response.ok) throw new Error('Não foi possível carregar os preços. Tente novamente.')
           const data = await response.json() as PriceResponse
           return [product.id, data.offers] as const
@@ -66,19 +69,19 @@ export function ConsumerSearch() {
   return <main className={styles.page}>
     <nav className={styles.nav} aria-label="Navegação principal">
       <Link href="/" className={styles.brand}><span className={styles.brandMark} aria-hidden="true">C</span><span>compra<span>fácil</span></span></Link>
-      <div className={styles.navRight}><span className={styles.location}><span aria-hidden="true">⌖</span> Rio Branco, AC</span><Link href="/login" className={styles.merchantLink}>Área do lojista <span aria-hidden="true">↗</span></Link></div>
+      <div className={styles.navRight}><span className={styles.location}><span aria-hidden="true">⌖</span> Acre, AC</span><Link href="/login" className={styles.merchantLink}>Área do lojista <span aria-hidden="true">↗</span></Link></div>
     </nav>
 
     <section className={styles.hero}>
       <div className={styles.heroCopy}>
         <span className={styles.eyebrow}><span className={styles.liveDot} /> COMPRAS MAIS INTELIGENTES, TODO DIA</span>
         <h1>Seu dinheiro<br />vale <em>mais.</em></h1>
-        <p>Compare os valores informados dos itens essenciais em mercados de Rio Branco e veja quando cada preço foi coletado.</p>
+        <p>Compare os valores informados dos itens essenciais nos mercados cadastrados no Acre e veja quando cada preço foi coletado.</p>
         <a href="#comparacao" className={styles.heroButton}>Comparar valores <span aria-hidden="true">↓</span></a>
       </div>
       <div className={styles.heroVisual} aria-hidden="true">
         <div className={`${styles.orbit} ${styles.orbitOne}`} /><div className={`${styles.orbit} ${styles.orbitTwo}`} />
-        <div className={styles.receipt}><span className={styles.receiptLabel}>VALORES INFORMADOS · SEM DATA</span><div className={styles.receiptLine}><span>Arroz 5 kg</span><strong>R$ 23,49</strong></div><div className={styles.receiptLine}><span>Café 250 g</span><strong>R$ 12,49</strong></div><div className={styles.receiptLine}><span>Açúcar 1 kg</span><strong>R$ 2,49</strong></div><div className={styles.receiptTotal}><span>COMPARE COM CLAREZA</span><b>↘</b></div></div>
+        <div className={styles.receipt}><span className={styles.receiptLabel}>COLETA · 24/10/2026</span><div className={styles.receiptLine}><span>Arroz 5 kg</span><strong>R$ 23,49</strong></div><div className={styles.receiptLine}><span>Café 250 g</span><strong>R$ 12,49</strong></div><div className={styles.receiptLine}><span>Açúcar 1 kg</span><strong>R$ 2,49</strong></div><div className={styles.receiptTotal}><span>COMPARE COM CLAREZA</span><b>↘</b></div></div>
         <span className={styles.heroSparkle}>✳</span><span className={styles.heroBadge}>Preço a preço,<br />você decide.</span>
       </div>
       <div className={styles.heroBottom}><span>01 — COMPARE</span><span>02 — ESCOLHA</span><span>03 — ECONOMIZE</span></div>
@@ -96,7 +99,7 @@ export function ConsumerSearch() {
         <span className={styles.searchHint}><kbd>⌕</kbd> Busque arroz, café, feijão…</span>
       </div>
 
-      <div className={styles.trustNote}><span className={styles.trustIcon} aria-hidden="true">✓</span><span><strong>Informação clara, escolha sua.</strong> Os preços indicados como verificados foram confirmados como dados reais. Sem data de coleta, eles não são tratados como preços atuais.</span></div>
+      <div className={styles.trustNote}><span className={styles.trustIcon} aria-hidden="true">✓</span><span><strong>Informação clara, escolha sua.</strong> Os preços-base foram informados pelo usuário, com coleta em 24/10/2026. A cobertura da consulta é estadual; a cidade e o endereço aparecem somente quando cadastrados.</span></div>
 
       {loading && <div className={styles.stateCard} role="status" aria-live="polite"><span className={styles.spinner} /> Carregando produtos e preços…</div>}
       {!loading && error && <div className={`${styles.stateCard} ${styles.errorState}`} role="alert"><strong>Não conseguimos carregar os preços.</strong><span>{error}</span></div>}
@@ -107,8 +110,8 @@ export function ConsumerSearch() {
         <div className={styles.tableFrame}>
           <div className={styles.tableScroll}>
             <table className={styles.table}>
-              <caption className={styles.srOnly}>Comparação de preços mais recentes por produto e mercado em Rio Branco</caption>
-              <thead><tr><th scope="col" className={styles.productHeader}>PRODUTO</th>{markets.map(market => <th scope="col" key={market.id}>{market.name}{market.demo && <small className={styles.demoLabel}>Demonstração</small>}<small className={styles.marketAddress}>{market.address ?? 'Endereço não informado'}</small></th>)}<th scope="col" className={styles.differenceHeader}>DIFERENÇA</th></tr></thead>
+              <caption className={styles.srOnly}>Comparação de preços mais recentes por produto e mercado no Acre</caption>
+              <thead><tr><th scope="col" className={styles.productHeader}>PRODUTO</th>{markets.map(market => <th scope="col" key={market.id}>{market.name}{market.demo && <small className={styles.demoLabel}>Demonstração</small>}<small className={styles.marketAddress}>{marketLocation(market)}</small></th>)}<th scope="col" className={styles.differenceHeader}>DIFERENÇA</th></tr></thead>
               <tbody>{products.map(product => {
                 const offers = offersByProduct[product.id] ?? []
                 const difference = priceDifferenceCents(offers)
@@ -139,6 +142,6 @@ export function ConsumerSearch() {
         <p className={styles.disclaimer}>“Verificado” confirma os dados informados; não substitui uma data de coleta. Preços sem data ficam fora do ranking de preço atual. Confirme o valor na loja antes de comprar.</p>
       </>}
     </section>
-    <footer className={styles.footer}><Link href="/" className={styles.brand}><span className={styles.brandMark} aria-hidden="true">C</span><span>compra<span>fácil</span></span></Link><span>Mais clareza para a sua próxima compra. <b>Rio Branco, AC</b></span></footer>
+    <footer className={styles.footer}><Link href="/" className={styles.brand}><span className={styles.brandMark} aria-hidden="true">C</span><span>compra<span>fácil</span></span></Link><span>Mais clareza para a sua próxima compra. <b>Acre, AC</b></span></footer>
   </main>
 }

@@ -1,6 +1,6 @@
 # Backend e API — base de preços
 
-Este documento define a origem de dados do MVP de comparação em Rio Branco/AC. Os valores fornecidos para Arasuper e Assaí são a fonte inicial do catálogo. Os registros abaixo ainda não têm data de coleta nem endereço de loja; portanto, não podem ser apresentados como preços atuais nem classificados como ofertas válidas até esses dados serem informados.
+Este documento define a origem de dados do MVP de comparação no Acre/AC. Os valores fornecidos para Arasuper e Assaí são a fonte inicial do catálogo. A coleta informada para os dez preços-base ocorreu em 24/10/2026. Os endereços não foram fornecidos e não devem ser presumidos.
 
 ## 1. Catálogo inicial
 
@@ -22,13 +22,13 @@ Este documento define a origem de dados do MVP de comparação em Rio Branco/AC.
 | Café Vovó Pureza | 250 g | 1399 | 1249 |
 | Farinha de trigo Campesina | 1 kg | 559 | 349 |
 
-Os valores são inteiros em centavos (`R$ 27,99` → `2799`). A tabela acima é a transcrição canônica dos preços recebidos. Não são fornecidos endereços nem datas de coleta. Os cadastros de mercado devem receber endereço real antes de servi-lo pela API.
+Os valores são inteiros em centavos (`R$ 27,99` → `2799`). A tabela acima é a transcrição canônica dos preços recebidos. Não são fornecidos endereços de loja. Os cadastros de mercado devem receber endereço real antes de servi-lo pela API.
 
 ## 3. Modelo de dados
 
 | Entidade | Campos principais | Regra |
 |---|---|---|
-| `market` | `id`, `nome`, `endereco`, `bairro`, `cidade`, `ativo` | Mercados iniciais: Arasuper e Assaí; endereço precisa ser confirmado. |
+| `market` | `id`, `nome`, `endereco`, `bairro`, `cidade`, `state`, `ativo` | UF filtra a cobertura estadual; endereço e cidade permanecem dados explícitos do cadastro. |
 | `product` | `id`, `nome`, `marca`, `categoria`, `unidade`, `ativo` | A unidade integra a identidade comparável do produto. |
 | `price` | `id`, `market_id`, `product_id`, `valor_centavos`, `data_coleta`, `fonte`, `created_at` | Registro append-only; a correção cria outro preço e preserva o anterior. |
 | `user` | `id`, `email`, `senha_hash`, `role`, `market_id`, `created_at` | Lojista só gerencia o mercado vinculado à sua conta. |
@@ -56,10 +56,10 @@ Todas as rotas públicas são JSON, sem autenticação, com CORS habilitado.
 | Método e rota | Parâmetros | Resultado |
 |---|---|---|
 | `GET /api/v1/products` | `q`, `category` opcionais | Catálogo, incluindo marca e unidade para identificar itens comparáveis. |
-| `GET /api/v1/markets` | `city` opcional; MVP restrito a Rio Branco/AC | Mercados ativos com nome e endereço cadastrado. |
-| `GET /api/v1/prices` | `product_id` e `city` | Ofertas do produto, com preço em centavos, mercado/endereço, coleta, validade e indicação se participa do ranking. |
+| `GET /api/v1/markets` | `state` opcional; padrão `AC`, cobertura estadual | Mercados ativos com nome e endereço cadastrado. |
+| `GET /api/v1/prices` | `product_id` e `state` | Ofertas do produto, com preço em centavos, mercado/endereço, coleta, validade e indicação se participa do ranking. |
 
-Exemplo de resposta de preço após a coleta ter sido cadastrada:
+Exemplo de resposta de preço com data de coleta informada:
 
 ```json
 {
@@ -77,7 +77,7 @@ Exemplo de resposta de preço após a coleta ter sido cadastrada:
 }
 ```
 
-Os valores de endereço e data no exemplo são marcadores explicativos, não dados reais. Não retornar um preço como `valid: true` sem data confirmada.
+O endereço no exemplo é marcador explicativo. A data 2026-10-24 é a coleta informada pelo usuário para os preços-base. A validade deve continuar sendo derivada da data pela regra de 30 dias.
 
 ## 6. Entrada e persistência
 

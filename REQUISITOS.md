@@ -1,4 +1,4 @@
-# REQUISITOS.md — Comparador de Preços de Supermercado (Rio Branco/AC)
+# REQUISITOS.md — Comparador de Preços de Supermercado (Acre/AC)
 
 > Status: rascunho alinhado para MVP de hackathon
 > Última atualização: 24/10/2026
@@ -8,12 +8,12 @@
 
 ## 1. Objetivo
 
-Dar ao consumidor de Rio Branco/AC um lugar único para descobrir **em qual supermercado da cidade um item alimentício está mais barato**, exibindo **preço, nome e endereço do mercado**.
+Dar ao consumidor do Acre um lugar único para descobrir **em qual mercado cadastrado no estado um item alimentício está mais barato**, exibindo **preço, nome e endereço do mercado**.
 
 O diferencial do produto é a **API pública de preços**: o mercado que quiser integrar seu sistema de estoque/PDV atualiza os preços automaticamente, sem digitação manual.
 
 ### Proposta de valor
-- Consumidor: economiza tempo e dinheiro comparando preços da cidade.
+- Consumidor: economiza tempo e dinheiro comparando preços dos mercados cadastrados no Acre.
 - Lojista: aparece na comparação com o preço correto, sem esforço manual.
 - Ecossistema: API aberta permite que terceiros construam sobre os dados.
 
@@ -25,7 +25,7 @@ O diferencial do produto é a **API pública de preços**: o mercado que quiser 
 |---|---|
 | Origem dos preços | Painel do lojista + API própria de atualização (push do mercado) |
 | Plataforma | Web agora (responsivo); app nativo depois |
-| Abrangência | Somente Rio Branco/AC; **cidade fixa** no MVP |
+| Abrangência | Acre/AC; consultar todos os mercados cadastrados no estado e exibir sua cidade conhecida |
 | Contas | Consumidor: login opcional. Lojista: login obrigatório. Perfis distintos |
 | Busca | Categoria + nome |
 | Frescor do preço | Exibir data de coleta; **preço perde relevância após 30 dias** |
@@ -51,7 +51,7 @@ O diferencial do produto é a **API pública de preços**: o mercado que quiser 
 - Integração automática real com PDV (apenas o contrato da API).
 - Pagamentos, assinaturas, anúncios.
 - Histórico/gráfico de variação de preço, notificações, favoritos.
-- Multi-cidade, CEP, mapa.
+- Abrangência fora do Acre, CEP e mapa.
 - OAuth2, verificação de e-mail, recuperação de senha.
 - Moderação antifraude.
 
@@ -91,7 +91,7 @@ O diferencial do produto é a **API pública de preços**: o mercado que quiser 
 
 ### API pública
 - **RF11** — `GET /api/v1/products?category=&q=` lista o catálogo.
-- **RF12** — `GET /api/v1/prices?product_id=&city=` retorna preços válidos com mercado, endereço, valor e data de coleta.
+- **RF12** — `GET /api/v1/prices?product_id=&state=` retorna preços válidos com mercado, endereço, valor e data de coleta.
 - **RF13** — `GET /api/v1/markets` lista mercados da cidade.
 - **RF14** — Respostas em JSON, somente leitura, sem autenticação, com CORS liberado.
 - **RF15** — (Stretch) `POST /api/v1/prices` com header `X-API-Key`, aceitando apenas o mercado dono da chave.

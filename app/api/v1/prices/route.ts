@@ -9,7 +9,7 @@ export function GET(request: NextRequest) {
   if (!productId || !/^[\w.-]+$/.test(productId)) return json({ error: 'product_id inválido' }, 400)
   const row = getDb().prepare('SELECT id,name,brand,category,unit FROM product WHERE id=? AND active=1').get(productId)
   if (!row) return json({ error: 'Produto não encontrado' }, 404)
-  const city = params.get('city') || 'Rio Branco'
-  return json({ product: productRow(row), offers: getProductOffers(productId, city) })
+  const state = params.get('state') || process.env.UF_PADRAO || 'AC'
+  return json({ product: productRow(row), offers: getProductOffers(productId, state) })
 }
 export function OPTIONS() { return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' } }) }

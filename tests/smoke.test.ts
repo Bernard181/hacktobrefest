@@ -16,7 +16,7 @@ async function products(q = '', category = ''): Promise<Product[]> {
 }
 
 async function prices(productId: string): Promise<Prices> {
-  const response = await fetch(`${baseUrl}/api/v1/prices?product_id=${encodeURIComponent(productId)}&city=Rio%20Branco`)
+  const response = await fetch(`${baseUrl}/api/v1/prices?product_id=${encodeURIComponent(productId)}&state=AC`)
   expect(response.status).toBe(200)
   return response.json()
 }

@@ -4,7 +4,7 @@ Este documento consolida os requisitos obrigatórios do MVP e define como valida
 
 ## Objetivo do produto
 
-Permitir que moradores de Rio Branco encontrem produtos básicos e comparem preços por mercado, com unidade equivalente, data de coleta e indicação clara de qual oferta pode ser considerada atual. O lojista deve poder atualizar preços apenas do mercado vinculado à sua conta.
+Permitir que moradores do Acre encontrem produtos básicos e comparem preços por mercado, com unidade equivalente, data de coleta e indicação clara de qual oferta pode ser considerada atual. O lojista deve poder atualizar preços apenas do mercado vinculado à sua conta.
 
 ## Funcionalidades obrigatórias do MVP
 
@@ -25,7 +25,7 @@ Permitir que moradores de Rio Branco encontrem produtos básicos e comparem pre�
 
 ## Dados de referência dos mercados
 
-Os dez valores fornecidos pelo usuário são armazenados em centavos e associados ao produto equivalente nos dois mercados. Eles ficam **verificados** porque o usuário confirmou que são reais. Como não foram fornecidas datas de coleta nem endereços, a interface não deve inventá-los: exibe a confirmação separada da coleta e mantém as ofertas fora do ranking de preço atual até receber a data.
+Os dez valores fornecidos pelo usuário são armazenados em centavos e associados ao produto equivalente nos dois mercados. Eles ficam **verificados** porque o usuário confirmou que são reais. A data de coleta informada é 24/10/2026 e é usada nos dez registros-base. Endereços e municípios além de Rio Branco não foram fornecidos: não devem ser inventados. O filtro estadual inclui qualquer mercado que venha a ser cadastrado no Acre, sem afirmar que existam lojas em municípios não cadastrados.
 
 | Produto e unidade | Marca | Arasuper | Assaí |
 |---|---|---:|---:|
@@ -43,7 +43,7 @@ Aplicativo nativo, geolocalização, múltiplas cidades, scraping, OCR, integra�
 
 1. Abrir a página inicial sem login e buscar arroz.
 2. Conferir a tabela por mercado, unidade, preço e estado da data de coleta.
-3. Verificar que preço sem data não recebe selo de preço atual nem entra no ranking.
+3. Verificar que os dez preços-base exibem coleta em 24/10/2026 e podem participar do ranking dentro da janela de validade.
 4. Entrar com a conta local de demonstração e atualizar um preço próprio.
 5. Tentar alterar o `market_id`; a API deve rejeitar a operação.
 6. Confirmar que a nova oferta aparece na tabela e na API pública.
@@ -53,6 +53,6 @@ Conta local de demonstração: `lojista@comprafacil.local` / `demo123`. A conta 
 
 ## Pitch estratégico
 
-**CompraFácil ajuda famílias de Rio Branco a decidir onde comprar cada produto básico com mais informação e menos esforço.** O MVP compara preços equivalentes entre mercados, mostra quando o valor foi coletado e permite que o próprio lojista mantenha a oferta atualizada. A API aberta transforma o catálogo em infraestrutura para futuras integrações.
+**CompraFácil ajuda famílias do Acre a decidir onde comprar cada produto básico com mais informação e menos esforço.** O MVP compara preços equivalentes entre mercados, mostra quando o valor foi coletado e permite que o próprio lojista mantenha a oferta atualizada. A API aberta transforma o catálogo em infraestrutura para futuras integrações.
 
-A estratégia de entrada é começar com poucos mercados e produtos essenciais, priorizando cobertura e confiança dos dados. A próxima expansão deve acontecer quando houver coleta recente suficiente e lojistas ativos; só então ampliar o catálogo e a área atendida. As métricas iniciais são percentual de ofertas verificadas nos últimos 30 dias, mercados com atualização ativa, produtos comparáveis e economia observada por cesta.
+A estratégia de entrada é começar com poucos mercados e produtos essenciais, priorizando cobertura e confiança dos dados. A próxima expansão deve acontecer quando houver coleta recente suficiente e lojistas ativos; ampliar o catálogo conforme a cobertura real dos mercados cadastrados. As métricas iniciais são percentual de ofertas verificadas nos últimos 30 dias, mercados com atualização ativa, produtos comparáveis e economia observada por cesta.

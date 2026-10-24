@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS market (
   address TEXT,
   neighborhood TEXT,
   city TEXT NOT NULL DEFAULT 'Rio Branco',
+  state TEXT NOT NULL DEFAULT 'AC',
   api_key_hash TEXT UNIQUE,
   active INTEGER NOT NULL DEFAULT 1 CHECK (active IN (0, 1)),
   demo INTEGER NOT NULL DEFAULT 0 CHECK (demo IN (0, 1))

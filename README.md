@@ -1,4 +1,4 @@
-# CompraFácil — Rio Branco/AC
+# CompraFácil — Acre/AC
 
 Comparador de preços de mercados com catálogo inicial, busca pública e painel de lojista. O contrato da API está em [`docs/api.md`](docs/api.md); requisitos de produto em [`REQUISITOS.md`](REQUISITOS.md).
 
@@ -20,4 +20,4 @@ npm run typecheck
 npm run smoke
 ```
 
-`npm run` lista os scripts disponíveis. `npm run db:reset` restaura o banco de demonstração; os preços recebidos para Arasuper e Assaí não têm data de coleta e são exibidos como não verificados até a coleta ser cadastrada.
+`npm run` lista os scripts disponíveis. `npm run db:reset` restaura os preços-base informados para Arasuper e Assaí com coleta em 24/10/2026 e dados de demonstração. A API consulta mercados por UF (`state=AC`); os mercados-base informados estão em Rio Branco, sem endereço presumido.

@@ -69,7 +69,7 @@ fly deploy
 | `DATABASE_PATH` | prod: sim | `./data/app.db` | arquivo SQLite |
 | `SESSION_SECRET` | sim (auth) | — | assinatura do cookie de sessão |
 | `PORT` | host define | `3000` | porta do `next start` |
-| `CIDADE_PADRAO` | não | `Rio Branco/AC` | cidade fixa do MVP |
+| `UF_PADRAO` | não | `AC` | UF padrão para consulta estadual |
 
 Segredos nunca no repositório (RNF05); `.env.example` documenta as chaves.
 
