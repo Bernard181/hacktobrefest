@@ -25,11 +25,14 @@ export function listMarkets(city = 'Rio Branco'): Market[] {
 }
 
 export function getProductOffers(productId: string, city = 'Rio Branco', marketId?: string) {
-  const raw = getDb().prepare(`SELECT p.id, m.id AS market_id, m.name AS market_name, m.address, m.neighborhood, m.city, m.demo, p.value_cents, p.collected_at, p.source
-    FROM price p JOIN market m ON m.id=p.market_id WHERE p.product_id=? AND m.city=? AND m.active=1 ${marketId ? 'AND m.id=?' : ''}`)
+  const raw = getDb().prepare(`SELECT p.id, p.rowid AS insertion_order, m.id AS market_id, m.name AS market_name, m.address, m.neighborhood, m.city, m.demo, p.value_cents, p.collected_at, p.verified, p.source
+    FROM price p JOIN market m ON m.id=p.market_id WHERE p.product_id=? AND m.city=? AND m.active=1 ${marketId ? 'AND m.id=?' : ''}
+    ORDER BY p.rowid DESC`)
     .all(...(marketId ? [productId, city, marketId] : [productId, city])) as any[]
-  return rankPrices(raw.map((r) => ({ id: r.id, market_id: r.market_id, market_name: r.market_name, address: r.address, neighborhood: r.neighborhood, city: r.city, demo: Boolean(r.demo), price_cents: r.value_cents, collected_at: r.collected_at, source: r.source })), new Date())
-    .map((r) => ({ id: r.id, market: { id: r.market_id, name: r.market_name, address: r.address, neighborhood: r.neighborhood, city: r.city, demo: r.demo }, price_cents: r.price_cents, collected_at: r.collected_at, valid: r.valid, ranked: r.ranked, source: r.source as 'painel' | 'api' | 'seed' }))
+  const latestByMarket = new Map<string, any>()
+  for (const row of raw) if (!latestByMarket.has(row.market_id)) latestByMarket.set(row.market_id, row)
+  return rankPrices([...latestByMarket.values()].map((r) => ({ id: r.id, market_id: r.market_id, market_name: r.market_name, address: r.address, neighborhood: r.neighborhood, city: r.city, demo: Boolean(r.demo), price_cents: r.value_cents, collected_at: r.collected_at, verified: Boolean(r.verified), source: r.source })), new Date())
+    .map((r) => ({ id: r.id, market: { id: r.market_id, name: r.market_name, address: r.address, neighborhood: r.neighborhood, city: r.city, demo: r.demo }, price_cents: r.price_cents, collected_at: r.collected_at, verified: r.verified, valid: r.valid, ranked: r.ranked, source: r.source as 'painel' | 'api' | 'seed' }))
 }
 
 const globalForDb = globalThis as typeof globalThis & { compraFacilDb?: Database.Database }
@@ -41,6 +44,10 @@ function createDatabase() {
   db.pragma('foreign_keys = ON')
   const schemaPath = path.join(process.cwd(), 'db', 'schema.sql')
   db.exec(fs.readFileSync(schemaPath, 'utf8'))
+  const priceColumns = db.prepare('PRAGMA table_info(price)').all() as { name: string }[]
+  if (!priceColumns.some((column) => column.name === 'verified')) {
+    db.exec('ALTER TABLE price ADD COLUMN verified INTEGER NOT NULL DEFAULT 0 CHECK (verified IN (0, 1))')
+  }
   return db
 }
 

@@ -12,9 +12,9 @@ Permitir que moradores de Rio Branco encontrem produtos básicos e comparem pre�
 |---|---|---|---|
 | FE-01 | Catálogo básico | Produto tem nome, marca, categoria e unidade; unidades diferentes permanecem como itens distintos. | UT-10, API-01/02 |
 | FE-02 | Busca pública | Buscar sem login por nome/marca, sem diferenciar maiúsculas ou acentos, e filtrar por categoria. Busca vazia não gera erro. | UT-15, API-01/02, SM-01 |
-| FE-03 | Comparação em tabela | Para cada produto, mostrar preço por mercado, marca/unidade, data, endereço quando conhecido e diferença entre ofertas comparáveis. | SM-02, MV-01/02 |
+| FE-03 | Comparação em tabela | Para cada produto, mostrar o preço mais recente de cada mercado, marca/unidade, data, endereço quando conhecido e diferença nominal entre ofertas. | UT-17, SM-02, MV-01/02 |
 | FE-04 | Ranking transparente | Somente preços válidos entram no ranking; menor valor vence; empates preservam os mercados empatados e priorizam coleta mais recente. | UT-01..08, SM-02 |
-| FE-05 | Frescor dos dados | Coletas até 30 dias são válidas; preços vencidos ou sem data continuam visíveis, recebem sinalização e não são classificados como menor preço atual. | UT-01..05, UT-16, SM-03, MV-05 |
+| FE-05 | Frescor e verificação dos dados | `verified` registra confirmação da informação; a validade depende da coleta. Preços sem data ficam visíveis, sinalizados e fora do ranking atual. | UT-01..05, UT-16, API-15, SEED-05, SM-03, MV-05 |
 | FE-06 | API pública de leitura | `GET /api/v1/products`, `/markets` e `/prices` retornam JSON documentado, sem credenciais, com CORS e estados de erro consistentes. | API-01..09, SM-06 |
 | FE-07 | Sessão do lojista | A área de gestão exige autenticação; senha armazenada em hash; sessão usa cookie protegido. | UT-14, SM-04 |
 | FE-08 | Isolamento por mercado | O servidor deriva o mercado da sessão e rejeita tentativa de gravar em outro mercado. | UT-12, SM-04 |
@@ -25,7 +25,7 @@ Permitir que moradores de Rio Branco encontrem produtos básicos e comparem pre�
 
 ## Dados de referência dos mercados
 
-Os dez valores fornecidos pelo usuário são armazenados em centavos e associados ao produto equivalente nos dois mercados. Como não foram fornecidas datas de coleta nem endereços, a interface não deve inventá-los. As ofertas ficam visíveis como **não verificadas**, sem entrar no ranking até que uma data de coleta seja informada.
+Os dez valores fornecidos pelo usuário são armazenados em centavos e associados ao produto equivalente nos dois mercados. Eles ficam **verificados** porque o usuário confirmou que são reais. Como não foram fornecidas datas de coleta nem endereços, a interface não deve inventá-los: exibe a confirmação separada da coleta e mantém as ofertas fora do ranking de preço atual até receber a data.
 
 | Produto e unidade | Marca | Arasuper | Assaí |
 |---|---|---:|---:|

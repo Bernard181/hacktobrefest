@@ -4,7 +4,7 @@ Este contrato foi publicado antes dos fluxos paralelos. Backend implementa estes
 
 ## Domínio e banco
 
-O schema em `db/schema.sql` é a fonte de verdade. IDs são strings estáveis. Dinheiro é sempre inteiro em centavos. `collected_at` pode ser `null` somente para preservar os preços recebidos sem data; esses valores aparecem como não verificados e jamais entram no ranking.
+O schema em `db/schema.sql` é a fonte de verdade. IDs são strings estáveis. Dinheiro é sempre inteiro em centavos. `verified` indica que a informação foi confirmada pelo usuário responsável ou por um lojista autenticado; não significa que o preço foi coletado recentemente. `collected_at` pode ser `null`; sem data, a oferta permanece fora do ranking.
 
 ## GET /api/v1/products?q=&category=
 
@@ -24,7 +24,8 @@ O schema em `db/schema.sql` é a fonte de verdade. IDs são strings estáveis. D
 
 - Público, JSON, CORS `*`; `product_id` é obrigatório; cidade omitida significa Rio Branco.
 - `200`: `{ "product": Product, "offers": Offer[] }`; produto inexistente: `404 { "error": "Produto não encontrado" }`.
-- Oferta: `{ "id": string, "market": Market, "price_cents": number, "collected_at": string | null, "valid": boolean, "ranked": boolean, "source": "painel" | "api" | "seed" }`.
+- Oferta: `{ "id": string, "market": Market, "price_cents": number, "collected_at": string | null, "verified": boolean, "valid": boolean, "ranked": boolean, "source": "painel" | "api" | "seed" }`. Uma coleta enviada por lojista autenticado recebe `verified: true`.
+- A resposta inclui o registro mais recentemente inserido para cada mercado. O histórico completo permanece append-only no banco; esta rota compara a oferta atual de cada mercado.
 - Ofertas válidas vêm primeiro por preço crescente; empates vêm por coleta mais recente. Preços vencidos e sem data permanecem visíveis após as válidas, com `ranked: false`. `valid` só é `true` quando a coleta está dentro dos últimos 30 dias inclusivos.
 
 ## Regras compartilhadas de domínio
@@ -52,4 +53,4 @@ Rotas privadas do painel:
 
 ## Seed e demonstração
 
-Os preços fornecidos para Arasuper e Assaí são incluídos com `collected_at: null`, sem endereço presumido; a interface sinaliza “Data não informada” e eles não aparecem como atuais/rankeados. Fixtures com endereços/dados fictícios dos testes precisam ser marcadas `demo: true` e claramente rotuladas na interface.
+Os preços fornecidos para Arasuper e Assaí são incluídos com `verified: true` e `collected_at: null`: foram confirmados como dados reais pelo usuário, mas não têm data de coleta, portanto não aparecem como atuais/rankeados. Endereços não são presumidos. Fixtures com endereços/dados fictícios dos testes precisam ser marcadas `demo: true` e claramente rotuladas na interface.

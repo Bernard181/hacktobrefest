@@ -43,6 +43,12 @@ describe('API pública (contrato v1)', () => {
     const json = await response.json()
     expect(json.offers[0]).toMatchObject({ price_cents: 2750, market: { id: 'M2', address: 'Rua B, 200 — Bosque, Rio Branco/AC' }, collected_at: '2026-10-23' })
   })
+  it('API-15 separa verificação da atualidade do preço informado', async () => {
+    const response = await pricesGET(req('/api/v1/prices?product_id=arroz-brilhante-5kg'))
+    const offers = (await response.json()).offers
+    expect(offers.find((offer: any) => offer.market.id === 'arasuper')).toMatchObject({ verified: true, collected_at: null, valid: false, ranked: false })
+    expect(offers.find((offer: any) => offer.market.id === 'assai')).toMatchObject({ verified: true, collected_at: null, valid: false, ranked: false })
+  })
   it('API-04 inclui vencido sinalizado e fora do ranking', async () => {
     const response = await pricesGET(req('/api/v1/prices?product_id=P1'))
     expect((await response.json()).offers.find((item: any) => item.market.id === 'M3')).toMatchObject({ valid: false, ranked: false })
@@ -90,8 +96,13 @@ describe('API de lojista', () => {
     const before = (getDb().prepare("SELECT COUNT(*) AS count FROM price WHERE market_id='M1' AND product_id='P1'").get() as any).count
     const created = await merchantPOST(postReq('/api/merchant/prices', { product_id: 'P1', value_cents: 999, collected_at: '2026-10-24' }))
     expect(created.status).toBe(201)
+    expect((await created.json()).item).toMatchObject({ verified: true, collected_at: '2026-10-24' })
     expect((getDb().prepare("SELECT COUNT(*) AS count FROM price WHERE market_id='M1' AND product_id='P1'").get() as any).count).toBe(before + 1)
+    expect(getDb().prepare("SELECT 1 FROM price WHERE market_id='M1' AND product_id='P1' AND value_cents=2890").get()).toBeTruthy()
     expect((getDb().prepare("SELECT value_cents FROM price WHERE market_id='M1' AND product_id='P1' ORDER BY rowid DESC LIMIT 1").get() as any).value_cents).toBe(999)
+    const currentOffers = await (await pricesGET(req('/api/v1/prices?product_id=P1'))).json()
+    expect(currentOffers.offers.filter((offer: any) => offer.market.id === 'M1')).toHaveLength(1)
+    expect(currentOffers.offers.find((offer: any) => offer.market.id === 'M1')).toMatchObject({ price_cents: 999, collected_at: '2026-10-24' })
   })
   it('UT-12 usa sempre o mercado vinculado à sessão', async () => {
     authState.user = { id: 'user-m1', email: 'merchant@example.test', role: 'merchant', marketId: 'M2' }
@@ -122,6 +133,10 @@ describe('integridade do seed', () => {
   it('SEED-04 só inclui valores positivos inteiros e datas não futuras', () => {
     const rows = getDb().prepare('SELECT value_cents,collected_at FROM price').all() as any[]
     expect(rows.every((row) => Number.isInteger(row.value_cents) && row.value_cents > 0 && (!row.collected_at || row.collected_at <= '2026-10-24'))).toBe(true)
+  })
+  it('SEED-05 marca como verificados os dez preços fornecidos para os mercados reais', () => {
+    const rows = getDb().prepare("SELECT COUNT(*) AS count FROM price WHERE id LIKE 'real-%' AND verified=1 AND collected_at IS NULL").get() as any
+    expect(rows.count).toBe(10)
   })
   it('SM-04 cria usuário de demonstração com senha apenas como hash e vínculo Arasuper', () => {
     const user = getDb().prepare("SELECT email,password_hash,role,market_id FROM user WHERE email='lojista@comprafacil.local'").get() as any

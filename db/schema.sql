@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS price (
   product_id TEXT NOT NULL REFERENCES product(id),
   value_cents INTEGER NOT NULL CHECK (value_cents > 0),
   collected_at TEXT,
+  verified INTEGER NOT NULL DEFAULT 0 CHECK (verified IN (0, 1)),
   source TEXT NOT NULL CHECK (source IN ('painel', 'api', 'seed')),
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CHECK (collected_at IS NULL OR collected_at GLOB '????-??-??')

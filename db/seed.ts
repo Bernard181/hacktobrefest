@@ -37,18 +37,18 @@ export async function seedDatabase() {
   ]
   for (const row of demo) product.run(...row)
 
-  const price = db.prepare('INSERT INTO price (id,market_id,product_id,value_cents,collected_at,source) VALUES (?,?,?,?,?,?)')
+  const price = db.prepare('INSERT INTO price (id,market_id,product_id,value_cents,collected_at,source,verified) VALUES (?,?,?,?,?,?,?)')
   const realPrices: [string, string, number][] = [
     ['arroz-brilhante-5kg', 'arasuper', 2799], ['feijao-dona-de-1kg', 'arasuper', 759], ['acucar-itamarati-1kg', 'arasuper', 309], ['cafe-vovo-pureza-250g', 'arasuper', 1399], ['farinha-campesina-1kg', 'arasuper', 559],
     ['arroz-brilhante-5kg', 'assai', 2349], ['farinha-campesina-1kg', 'assai', 349], ['cafe-vovo-pureza-250g', 'assai', 1249], ['feijao-dona-de-1kg', 'assai', 665], ['acucar-itamarati-1kg', 'assai', 249],
   ]
-  realPrices.forEach(([productId, marketId, cents], index) => price.run(`real-${index + 1}`, marketId, productId, cents, null, 'seed'))
+  realPrices.forEach(([productId, marketId, cents], index) => price.run(`real-${index + 1}`, marketId, productId, cents, null, 'seed', 1))
   const fixtures: [string, string, number, string][] = [
     ['P1', 'M1', 2890, '2026-10-24'], ['P1', 'M2', 2750, '2026-10-23'], ['P1', 'M3', 2650, '2026-09-20'],
     ['P4', 'M1', 1990, '2026-10-20'], ['P4', 'M2', 1990, '2026-10-22'],
     ['P3', 'M1', 499, '2026-10-24'], ['P3', 'M2', 519, '2026-10-24'],
   ]
-  fixtures.forEach(([productId, marketId, cents, collected], index) => price.run(`demo-${index + 1}`, marketId, productId, cents, collected, 'seed'))
+  fixtures.forEach(([productId, marketId, cents, collected], index) => price.run(`demo-${index + 1}`, marketId, productId, cents, collected, 'seed', 0))
   })
   seed()
   console.log('Banco inicializado com catálogo real sem data de coleta e fixtures de demonstração.')

@@ -85,6 +85,7 @@ Relógio fixo de referência: `AGORA = 2026-10-24T12:00:00Z`. **Nunca** use `Dat
 | UT-14 | Senha do usuário | armazenada com hash, nunca em texto puro | RNF03 | P0 |
 | UT-15 | Busca sem resultados | retorna `[]`, sem erro | RF01 | P1 |
 | UT-16 | Preço sem `data_coleta` | permanece visível com `valido: false` e fora do ranking | RN01, RN04 | P0 |
+| UT-17 | Comparação de duas ofertas sem data | exibe diferença nominal em centavos sem atribuir vencedor atual | RF02, RN09 | P0 |
 
 ### Exemplo de teste (nomes ilustrativos)
 
@@ -118,6 +119,7 @@ describe('RN01 — validade de 30 dias', () => {
 | SEED-02 | Fixture do P1 | preço em M1, M2 e M3; exatamente um com mais de 30 dias | P0 |
 | SEED-03 | Fixture do P4 | dois preços iguais em mercados distintos, com datas diferentes | P1 |
 | SEED-04 | Sanidade dos preços | nenhuma `data_coleta` futura; todo valor inteiro > 0 | P0 |
+| SEED-05 | Preços reais informados | os 10 valores Arasuper/Assaí têm `verified=1`, sem data de coleta inventada | P0 |
 
 ## 5. Casos de API (integração)
 
@@ -132,6 +134,8 @@ describe('RN01 — validade de 30 dias', () => {
 | API-07 | GET sem credencial | responde `200` | RF14, RF05 | P0 |
 | API-08 | `GET /api/v1/markets` | mercados de Rio Branco com nome/endereço | RF13 | P1 |
 | API-09 | Query inválida (`category` vazia, `product_id` malformado) | `400` ou lista vazia, nunca `500` | RF11/RF12 | P1 |
+| API-15 | Preço confirmado sem data | `verified: true` aparece separado de `valid: false` e `ranked: false` | RF12, RN01 | P0 |
+| API-16 | Atualização autenticada pelo lojista | registro novo recebe `verified: true` e a coleta informada | RF08, RN06 | P0 |
 | API-10 | `POST /api/v1/prices` sem `X-API-Key` | `401` | RF15 | P2 |
 | API-11 | POST com chave de outro mercado | `403` | RF15, RN07 | P2 |
 | API-12 | POST válido | `201`; preço aparece no GET | RF15 | P2 |
@@ -169,17 +173,17 @@ describe('RN01 — validade de 30 dias', () => {
 | RF | Casos |
 |---|---|
 | RF01 | UT-15, API-01, API-02, SM-01 |
-| RF02 | UT-04, UT-06, SM-02 |
+| RF02 | UT-04, UT-06, UT-17, SM-02 |
 | RF03 | API-03, SM-02 |
 | RF04 | UT-03, UT-05, UT-16, SM-03, MV-05 |
 | RF05 | API-07, SM-01 |
 | RF06 | SM-04 |
 | RF07 | UT-12, API-11, SM-04 |
-| RF08 | API-12, SM-04, SM-05 |
+| RF08 | API-12, API-16, SM-04, SM-05 |
 | RF09 | UT-13 |
 | RF10 | UT-12, API-11 |
 | RF11 | UT-15, API-01, API-02, API-09 |
-| RF12 | API-03, API-04, API-05, SM-06 |
+| RF12 | API-03, API-04, API-05, API-15, SM-06 |
 | RF13 | API-08 |
 | RF14 | API-06, API-07 |
 | RF15 | API-10 a API-14, SM-07 |
@@ -188,7 +192,7 @@ describe('RN01 — validade de 30 dias', () => {
 
 | RN | Casos |
 |---|---|
-| RN01 | UT-01, UT-02, UT-03, UT-04, UT-16 |
+| RN01 | UT-01, UT-02, UT-03, UT-04, UT-16, API-15 |
 | RN02 | UT-04 |
 | RN03 | UT-06 |
 | RN04 | UT-05, UT-16, API-04, SM-03 |

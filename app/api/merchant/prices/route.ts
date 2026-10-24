@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
   if (!db.prepare('SELECT 1 FROM product WHERE id=? AND active=1').get(product_id)) return json({ error: 'Produto não encontrado' }, 400)
   if (!db.prepare('SELECT 1 FROM market WHERE id=? AND active=1').get(marketId)) return json({ error: 'Mercado não encontrado' }, 403)
   const id = `price-${crypto.randomUUID()}`
-  db.prepare('INSERT INTO price (id,market_id,product_id,value_cents,collected_at,source) VALUES (?,?,?,?,?,?)').run(id, marketId, product_id, value_cents, collected_at, 'painel')
-  const created = db.prepare('SELECT id,value_cents,collected_at,source FROM price WHERE id=?').get(id) as any
-  return json({ item: { id: created.id, product_id, market_id: marketId, price_cents: created.value_cents, collected_at: created.collected_at, source: created.source } }, 201)
+  db.prepare('INSERT INTO price (id,market_id,product_id,value_cents,collected_at,source,verified) VALUES (?,?,?,?,?,?,1)').run(id, marketId, product_id, value_cents, collected_at, 'painel')
+  const created = db.prepare('SELECT id,value_cents,collected_at,verified,source FROM price WHERE id=?').get(id) as any
+  return json({ item: { id: created.id, product_id, market_id: marketId, price_cents: created.value_cents, collected_at: created.collected_at, verified: Boolean(created.verified), source: created.source } }, 201)
 }
