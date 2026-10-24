@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Requisitos do produto
+    url: https://github.com/Bernard181/hacktobrefest/blob/main/REQUISITOS.md
+    about: Escopo, regras de negócio, critérios de aceite e decisões congeladas.
+  - name: Plano de testes
+    url: https://github.com/Bernard181/hacktobrefest/blob/main/TESTES.md
+    about: Casos UT/SEED/API/SM/MV, fixtures e rastreabilidade.
+  - name: Instruções para agentes
+    url: https://github.com/Bernard181/hacktobrefest/blob/main/AGENTS.md
+    about: Modelo multiagente, posse de arquivos, commits e definição de pronto.

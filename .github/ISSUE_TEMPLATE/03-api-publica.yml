@@ -1,0 +1,94 @@
+name: "Fluxo: API pública"
+description: "RF11–RF15 — leitura JSON, CORS, mercados e escrita por API key (stretch)"
+title: "feat: API pública de preços"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Baseado em `REQUISITOS.md` (RF11–RF15, RN01–RN09) e `TESTES.md`.
+        Leitura é pública e sem auth. Escrita por API key é *stretch* e só começa após os critérios 1–6 da demo.
+
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      description: Qual contrato da API será entregue?
+      placeholder: "GET /api/v1/prices devolve preços válidos com mercado, endereço e data de coleta."
+    validations:
+      required: true
+
+  - type: textarea
+    id: aceite
+    attributes:
+      label: Critérios de aceite
+      value: |
+        - [ ] RF11 — `GET /api/v1/products?category=&q=`
+        - [ ] RF12 — `GET /api/v1/prices?product_id=&city=` com mercado, endereço, valor e data
+        - [ ] RF13 — `GET /api/v1/markets`
+        - [ ] RF14 — JSON, somente leitura, sem auth e CORS liberado
+        - [ ] RN01/RN02 — retornar apenas preços válidos no ranking
+        - [ ] RN04 — preço vencido sinalizado, nunca vencedor
+        - [ ] RF15 (stretch) — `POST /api/v1/prices` com `X-API-Key`, só o dono da chave
+        - [ ] RN07/RN08 — validar `market_id` e API key no servidor
+    validations:
+      required: true
+
+  - type: textarea
+    id: testes
+    attributes:
+      label: Testes vinculados
+      description: Implemente no mesmo commit e marque o que se aplica. Detalhes em TESTES.md.
+      value: |
+        Núcleo (P0/P1):
+        - API-01 — filtro por categoria
+        - API-02 — busca textual sem diferenciar caixa/acento
+        - API-03 — shape do JSON de preços
+        - API-04 — preço vencido fora do ranking e sinalizado
+        - API-05 — produto inexistente com resposta consistente
+        - API-06 — header CORS presente
+        - API-07 — GET responde 200 sem credencial
+        - API-08 — mercados de Rio Branco com nome/endereço
+        - API-09 — query inválida nunca retorna 500
+        - SM-06 — mesmo dado visível na API e na busca
+
+        Stretch (P2):
+        - API-10 — POST sem chave retorna 401
+        - API-11 — chave de outro mercado retorna 403
+        - API-12 — POST válido retorna 201 e aparece no GET
+        - API-13 — data futura ou valor <= 0 retorna 400
+        - API-14 — POST preserva o preço anterior (append-only)
+        - SM-07 — POST com X-API-Key reflete na busca
+    validations:
+      required: true
+
+  - type: dropdown
+    id: prioridade
+    attributes:
+      label: Prioridade
+      options:
+        - P0 — bloqueia a demo
+        - P1 — importante
+        - P2 — stretch
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: dod
+    attributes:
+      label: Definição de pronto
+      options:
+        - label: Testes dos casos acima implementados no mesmo commit
+          required: true
+        - label: "`npm test` verde"
+          required: true
+        - label: "`npm run typecheck` verde"
+          required: true
+        - label: "`npm run smoke` verde quando houver mudança visível"
+        - label: "Commit no padrão `feat(escopo): ...`"
+          required: true
+
+  - type: textarea
+    id: notas
+    attributes:
+      label: Notas, dependências e riscos

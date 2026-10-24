@@ -1,0 +1,70 @@
+name: "Infra: scaffold, comandos e deploy"
+description: "RNF05/RNF07 — Next.js + SQLite, scripts npm, schema e deploy na primeira meia hora"
+title: "refactor: scaffold e deploy"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Primeiro item do plano de execução (`REQUISITOS.md` seção 10, 0:00–0:20).
+        Sem isso, os demais agentes não conseguem rodar nem verificar nada.
+
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      description: O que será criado no scaffold?
+      placeholder: "Next.js App Router + TypeScript + SQLite, scripts npm e deploy público vazio."
+    validations:
+      required: true
+
+  - type: textarea
+    id: aceite
+    attributes:
+      label: Critérios de aceite
+      value: |
+        - [ ] Next.js (App Router, TypeScript) + SQLite no mesmo repositório
+        - [ ] `package.json` com `dev`, `db:reset`, `test`, `test:watch`, `smoke`, `typecheck`
+        - [ ] `db/schema.sql` com `market`, `product`, `price`, `user`
+        - [ ] `docs/api.md` com o contrato de `GET /api/v1/products|prices|markets`
+        - [ ] superfície de `lib/prices.ts` definida (validade, ranking, moeda)
+        - [ ] deploy público acessível por link
+        - [ ] segredos em variáveis de ambiente, nunca no repo
+    validations:
+      required: true
+
+  - type: textarea
+    id: testes
+    attributes:
+      label: Testes vinculados
+      description: Scaffold não tem regra de negócio; verifique a infraestrutura.
+      value: |
+        Verificações de infraestrutura:
+        - `npm test` executa (mesmo que ainda sem casos) e sai com código 0
+        - `npm run db:reset` roda duas vezes seguidas sem erro (idempotente)
+        - `npm run typecheck` verde
+        - `npm run smoke` existe e falha de forma clara enquanto não houver API
+        - SEED-01 — após `db:reset`, o banco tem os mercados esperados
+
+        Não aplicável: testes de RN01–RN10 (pertencem aos fluxos).
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: dod
+    attributes:
+      label: Definição de pronto
+      options:
+        - label: Scripts npm criados e documentados no AGENTS.md
+          required: true
+        - label: Deploy público responde antes do fim da primeira meia hora
+          required: true
+        - label: "`npm test` e `npm run typecheck` executam sem erro"
+          required: true
+        - label: "Commit no padrão `refactor(infra): ...`"
+          required: true
+
+  - type: textarea
+    id: notas
+    attributes:
+      label: Notas, dependências e riscos

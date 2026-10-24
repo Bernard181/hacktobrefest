@@ -1,0 +1,91 @@
+name: "Fluxo: admin do lojista"
+description: "RF06–RF10 — login, isolamento por mercado, atualização de preço e API key"
+title: "feat: admin do lojista"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Baseado em `REQUISITOS.md` (RF06–RF10, RN05–RN08) e `TESTES.md`.
+        Lojista só escreve no próprio `market_id`; validar no servidor, nunca só na UI.
+
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      description: Qual fluxo do lojista será entregue?
+      placeholder: "Lojista entra, vê apenas os preços do seu mercado e atualiza um item."
+    validations:
+      required: true
+
+  - type: textarea
+    id: aceite
+    attributes:
+      label: Critérios de aceite
+      value: |
+        - [ ] RF06 — cadastro/login com e-mail e senha
+        - [ ] RF07 — lojista vê somente o mercado vinculado ao seu usuário
+        - [ ] RF08 — criar/atualizar preço com valor e data de coleta
+        - [ ] RF09 — gerar API key da loja, exibida uma única vez
+        - [ ] RF10 — perfis `consumidor` e `lojista` separados
+        - [ ] RN05 — rejeitar `data_coleta` futura
+        - [ ] RN06 — atualização cria novo registro (append-only)
+        - [ ] RN07 — escrita em outro mercado rejeitada no servidor
+        - [ ] RN08 — API key armazenada como hash e revogável
+    validations:
+      required: true
+
+  - type: textarea
+    id: testes
+    attributes:
+      label: Testes vinculados
+      description: Implemente no mesmo commit e marque o que se aplica. Detalhes em TESTES.md.
+      value: |
+        Unitários:
+        - UT-09 — data de coleta futura rejeitada
+        - UT-11 — atualização de preço preserva o registro anterior
+        - UT-12 — lojista de M1 não grava em M2
+        - UT-13 — API key em hash SHA-256, exibida uma vez
+        - UT-14 — senha com hash, nunca em texto puro
+
+        Integração/API (stretch para escrita via API):
+        - API-10 — POST sem X-API-Key retorna 401
+        - API-11 — chave de outro mercado retorna 403
+        - API-13 — data futura ou valor <= 0 retorna 400
+
+        Smoke/manual:
+        - SM-04 / SM-05 — login, alteração e reflexo na busca
+        - MV-04 — estados de erro e vazio
+    validations:
+      required: true
+
+  - type: dropdown
+    id: prioridade
+    attributes:
+      label: Prioridade
+      options:
+        - P0 — bloqueia a demo
+        - P1 — importante
+        - P2 — stretch
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: dod
+    attributes:
+      label: Definição de pronto
+      options:
+        - label: Testes dos casos acima implementados no mesmo commit
+          required: true
+        - label: "`npm test` verde"
+          required: true
+        - label: "`npm run typecheck` verde"
+          required: true
+        - label: "`npm run smoke` verde quando houver mudança visível"
+        - label: "Commit no padrão `feat(escopo): ...`"
+          required: true
+
+  - type: textarea
+    id: notas
+    attributes:
+      label: Notas, dependências e riscos

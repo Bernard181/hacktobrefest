@@ -1,0 +1,99 @@
+name: "Bug"
+description: "Correção com teste de regressão obrigatório"
+title: "fix: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Todo bug fix exige **teste de regressão**: ele deve falhar antes da correção e passar depois.
+        Referencie o ID do caso em `TESTES.md` (`UT-*`, `SEED-*`, `API-*`, `SM-*`, `MV-*`).
+
+  - type: textarea
+    id: descricao
+    attributes:
+      label: Descrição do bug
+      description: O que está errado, em uma ou duas frases.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproducao
+    attributes:
+      label: Passos para reproduzir
+      placeholder: |
+        1. Abrir a busca sem login
+        2. Buscar "arroz" em Grãos
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: esperado
+    attributes:
+      label: Comportamento esperado
+    validations:
+      required: true
+
+  - type: textarea
+    id: atual
+    attributes:
+      label: Comportamento atual
+    validations:
+      required: true
+
+  - type: dropdown
+    id: requisito
+    attributes:
+      label: Requisito afetado
+      options:
+        - RF01–RF05 — busca do consumidor
+        - RF06–RF10 — admin/login do lojista
+        - RF11–RF15 — API pública
+        - RN01–RN04 — validade e ranking
+        - RN05–RN08 — escrita, isolamento e API key
+        - RN09–RN10 — dinheiro e unidade
+        - Infra / deploy
+        - Não sei
+    validations:
+      required: true
+
+  - type: input
+    id: caso
+    attributes:
+      label: ID do teste de regressão
+      description: Caso de TESTES.md que cobre o bug (novo ou existente).
+      placeholder: "ex.: UT-04"
+    validations:
+      required: true
+
+  - type: textarea
+    id: regressao
+    attributes:
+      label: Plano do teste de regressão
+      value: |
+        - Falha antes do fix? (descreva o resultado observado)
+        - Passa depois do fix?
+        - O teste é determinístico (relógio injetado / banco resetado)?
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: dod
+    attributes:
+      label: Definição de pronto
+      options:
+        - label: Teste de regressão escrito e falhando antes do fix
+          required: true
+        - label: "`npm test` verde depois do fix"
+          required: true
+        - label: "`npm run typecheck` verde"
+          required: true
+        - label: "Commit no padrão `fix(escopo): ...`"
+          required: true
+
+  - type: input
+    id: ambiente
+    attributes:
+      label: Ambiente
+      placeholder: "ex.: local, Node 22, Windows 11, Chrome 130"

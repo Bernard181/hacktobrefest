@@ -1,0 +1,71 @@
+name: "Dados: seed de demonstração"
+description: "Coleta manual e fixtures — 2–3 mercados, P1 em 3 mercados e 1 preço vencido"
+title: "feat: seed de demonstração"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Baseado no item 6 do escopo e no roteiro da demo (`REQUISITOS.md` seções 3 e 11).
+        Teto de coleta: **40 minutos**, um único responsável, 2–3 mercados × ~10 produtos.
+
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      description: Quais dados entram no seed e de onde vieram?
+      placeholder: "Coleta em 3 mercados de Rio Branco, ~10 itens, com endereço e data de coleta."
+    validations:
+      required: true
+
+  - type: textarea
+    id: aceite
+    attributes:
+      label: Critérios de aceite
+      value: |
+        - [ ] 2–3 mercados de Rio Branco com nome, endereço e bairro
+        - [ ] ~10 produtos com categoria e unidade
+        - [ ] P1 ("Arroz Branco 5 kg") com preço em 3 mercados
+        - [ ] exatamente um preço de P1 com mais de 30 dias
+        - [ ] P4 com empate de valor entre dois mercados e datas diferentes
+        - [ ] nenhum preço com data futura; todos os valores inteiros > 0
+        - [ ] dados de demonstração rotulados como tal
+    validations:
+      required: true
+
+  - type: textarea
+    id: testes
+    attributes:
+      label: Testes vinculados
+      description: Valide o seed automaticamente sempre que possível. Detalhes em TESTES.md.
+      value: |
+        Integridade do seed:
+        - SEED-01 — 3 mercados ativos em Rio Branco com nome e endereço
+        - SEED-02 — P1 em M1, M2 e M3, com exatamente um preço > 30 dias
+        - SEED-03 — P4 com dois preços iguais e datas diferentes
+        - SEED-04 — nenhuma data futura; valores inteiros > 0
+
+        Smoke/manual:
+        - SM-02 / SM-03 — ranking e preço vencido visíveis na demo
+        - MV-03 — dados rotulados como demonstração
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: dod
+    attributes:
+      label: Definição de pronto
+      options:
+        - label: Coleta concluída dentro do teto de 40 minutos
+          required: true
+        - label: Testes de integridade do seed implementados
+          required: true
+        - label: "`npm run db:reset` recria o seed de forma idempotente"
+          required: true
+        - label: "Commit no padrão `feat(seed): ...`"
+          required: true
+
+  - type: textarea
+    id: notas
+    attributes:
+      label: Notas, dependências e riscos

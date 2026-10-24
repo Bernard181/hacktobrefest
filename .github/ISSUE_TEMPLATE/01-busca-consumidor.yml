@@ -1,0 +1,92 @@
+name: "Fluxo: busca do consumidor"
+description: "RF01–RF05 — busca por categoria/nome, ranking crescente e preço vencido"
+title: "feat: busca do consumidor"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Baseado em `REQUISITOS.md` (RF01–RF05, RN01–RN04, RN09–RN10) e `TESTES.md`.
+        A seção 2 do `REQUISITOS.md` está congelada: não reabra decisões de produto.
+
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      description: O que o consumidor passa a conseguir fazer?
+      placeholder: "Buscar 'arroz' na categoria Grãos e ver o mercado mais barato, com endereço e data de coleta."
+    validations:
+      required: true
+
+  - type: textarea
+    id: aceite
+    attributes:
+      label: Critérios de aceite
+      value: |
+        - [ ] RF01 — buscar por nome com filtro de categoria
+        - [ ] RF02 — ordenar do menor para o maior preço
+        - [ ] RF03 — exibir produto, preço, mercado, endereço e data de coleta
+        - [ ] RF04 — sinalizar preço com mais de 30 dias e excluí-lo do ranking
+        - [ ] RF05 — funcionar sem login
+        - [ ] RN10 — não comparar unidades diferentes (5 kg vs 1 kg)
+    validations:
+      required: true
+
+  - type: textarea
+    id: testes
+    attributes:
+      label: Testes vinculados
+      description: Implemente no mesmo commit e marque o que se aplica. Detalhes e fixtures em TESTES.md.
+      value: |
+        Unitários:
+        - UT-01 / UT-02 / UT-03 — validade em 29, 30 e 31 dias
+        - UT-04 — ranking exclui vencido e escolhe o menor válido
+        - UT-05 — preço vencido visível, mas fora do ranking
+        - UT-06 — empate ordenado do mais recente para o mais antigo
+        - UT-07 / UT-08 — centavos inteiros e formatação R$
+        - UT-09 — data futura rejeitada
+        - UT-10 — unidades diferentes não entram no mesmo ranking
+        - UT-11 — append-only ao atualizar
+        - UT-15 — busca sem resultado retorna []
+
+        API:
+        - API-01 / API-02 — filtro por categoria e busca textual
+        - API-03 / API-04 — shape do JSON e preço vencido
+        - API-06 / API-07 — CORS e leitura sem autenticação
+
+        Smoke/manual:
+        - SM-01 / SM-02 / SM-03 — roteiro da demo
+        - MV-02 / MV-05 — pt-BR e selo de vencido
+    validations:
+      required: true
+
+  - type: dropdown
+    id: prioridade
+    attributes:
+      label: Prioridade
+      options:
+        - P0 — bloqueia a demo
+        - P1 — importante
+        - P2 — stretch
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: dod
+    attributes:
+      label: Definição de pronto
+      options:
+        - label: Testes dos casos acima implementados no mesmo commit
+          required: true
+        - label: "`npm test` verde"
+          required: true
+        - label: "`npm run typecheck` verde"
+          required: true
+        - label: "`npm run smoke` verde quando houver mudança visível"
+        - label: "Commit no padrão `feat(escopo): ...`"
+          required: true
+
+  - type: textarea
+    id: notas
+    attributes:
+      label: Notas, dependências e riscos
