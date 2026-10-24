@@ -7,12 +7,12 @@ Instruções para agentes que trabalham neste repositório. Leia `REQUISITOS.md`
 - `REQUISITOS.md` manda em **comportamento de produto**: escopo, regras de negócio, critérios de aceite.
 - A seção 2 ("Decisões fechadas") está **congelada**. Não reabra essas decisões nem pergunte de novo.
 - Config/scripts mandam em **como rodar**. Se código e doc divergirem, corrija o doc na mesma tarefa.
-- Estado atual: repositório sem código (só `README.md`, `LICENSE`, `REQUISITOS.md`). O scaffold ainda não existe.
+- Estado atual: scaffold full-stack implementado em Next.js App Router, TypeScript e SQLite.
 
-## Stack padrão (confirmar antes de codar)
+## Stack adotada
 
 Monólito Next.js (App Router, TypeScript) + SQLite. Um repo, um deploy, um banco — nada de microserviços.
-Se a equipe escolher outra stack, **atualize esta seção antes de paralelizar agentes**; caso contrário, todos os agentes devem assumir esta.
+Esta stack está configurada no scaffold. Se o projeto mudar, atualize esta seção antes de paralelizar agentes.
 
 ## Modelo multiagente
 
@@ -98,18 +98,18 @@ Depois disso, mudança de schema ou de resposta JSON **exige** atualizar o doc e
 
 ## Comandos
 
-Ainda não existem; o Integrador deve criá-los no scaffold e manter esta lista correta:
+O Integrador mantém estes scripts sincronizados com `package.json`:
 
 ```bash
 npm run dev        # servidor local
 npm run db:reset   # aplica schema + seed de demonstração
 npm test           # testes unitários (regras de negócio) — obrigatório
 npm run test:watch # testes durante o desenvolvimento
-npm run smoke      # valida os critérios de aceite 1–6 contra localhost
+npm run smoke      # valida os critérios de aceite 1–6 contra localhost:3000
 npm run typecheck
 ```
 
-Enquanto o scaffold não existir, não invente comandos nem afirme que testes passaram.
+O `npm run smoke` depende de um servidor local em `localhost:3000` e de banco semeado.
 
 ## Dados da demo
 
@@ -124,3 +124,13 @@ O MVP está pronto quando os passos **1–6** da seção 11 do `REQUISITOS.md` r
 ## Guarda de escopo
 
 Proibido no MVP: app nativo, geolocalização/raio, crowdsourcing, scraping, OCR, pagamentos, notificações, favoritos, mapa, multi-cidade, OAuth2, verificação de e-mail, antifraude. Lista completa na seção 3 do `REQUISITOS.md`. Na dúvida, **não implemente** — registre como pós-MVP.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

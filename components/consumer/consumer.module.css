@@ -1,0 +1,30 @@
+.searchGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 260px);
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.searchGrid label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.searchGrid input,
+.searchGrid select {
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  border: 1px solid #aab9ad;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #fff;
+}
+
+@media (max-width: 560px) {
+  .searchGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

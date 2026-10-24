@@ -1,7 +1,7 @@
 # TESTES.md — Plano de Testes do MVP
 
 > Derivado de `REQUISITOS.md` (RF/RN) e `AGENTS.md` (fluxo por issue).
-> Status: **plano** — nenhum teste implementado; o scaffold ainda não existe.
+> Status: **implementado** — testes unitários, API e smoke estão no repositório; comandos verificados no scaffold atual.
 > Runner padrão: Vitest (Next.js). Se a stack mudar, preserve os mesmos IDs e casos.
 
 ## 1. Estratégia
@@ -84,6 +84,7 @@ Relógio fixo de referência: `AGORA = 2026-10-24T12:00:00Z`. **Nunca** use `Dat
 | UT-13 | Gerar API key | armazenada como hash SHA-256; texto puro exibido uma vez | RN08 | P1 |
 | UT-14 | Senha do usuário | armazenada com hash, nunca em texto puro | RNF03 | P0 |
 | UT-15 | Busca sem resultados | retorna `[]`, sem erro | RF01 | P1 |
+| UT-16 | Preço sem `data_coleta` | permanece visível com `valido: false` e fora do ranking | RN01, RN04 | P0 |
 
 ### Exemplo de teste (nomes ilustrativos)
 
@@ -170,7 +171,7 @@ describe('RN01 — validade de 30 dias', () => {
 | RF01 | UT-15, API-01, API-02, SM-01 |
 | RF02 | UT-04, UT-06, SM-02 |
 | RF03 | API-03, SM-02 |
-| RF04 | UT-03, UT-05, SM-03, MV-05 |
+| RF04 | UT-03, UT-05, UT-16, SM-03, MV-05 |
 | RF05 | API-07, SM-01 |
 | RF06 | SM-04 |
 | RF07 | UT-12, API-11, SM-04 |
@@ -187,10 +188,10 @@ describe('RN01 — validade de 30 dias', () => {
 
 | RN | Casos |
 |---|---|
-| RN01 | UT-01, UT-02, UT-03, UT-04 |
+| RN01 | UT-01, UT-02, UT-03, UT-04, UT-16 |
 | RN02 | UT-04 |
 | RN03 | UT-06 |
-| RN04 | UT-05, API-04, SM-03 |
+| RN04 | UT-05, UT-16, API-04, SM-03 |
 | RN05 | UT-09, API-13 |
 | RN06 | UT-11, API-14 |
 | RN07 | UT-12, API-11 |
