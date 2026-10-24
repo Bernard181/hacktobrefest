@@ -1,0 +1,22 @@
+# Blueprint do Render — web service Docker com disco persistente.
+# Aplicar em: Dashboard > New > Blueprint > selecionar o repositorio.
+services:
+  - type: web
+    name: comparador-precos
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_PATH
+        value: /data/app.db
+      - key: SESSION_SECRET
+        sync: false
+      - key: NODE_ENV
+        value: production
+    disk:
+      name: sqlite-data
+      mountPath: /data
+      sizeGB: 1

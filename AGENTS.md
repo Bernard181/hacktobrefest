@@ -7,7 +7,7 @@ Instruções para agentes que trabalham neste repositório. Leia `REQUISITOS.md`
 - `REQUISITOS.md` manda em **comportamento de produto**: escopo, regras de negócio, critérios de aceite.
 - A seção 2 ("Decisões fechadas") está **congelada**. Não reabra essas decisões nem pergunte de novo.
 - Config/scripts mandam em **como rodar**. Se código e doc divergirem, corrija o doc na mesma tarefa.
-- Estado atual: repositório sem código (só `README.md`, `LICENSE`, `REQUISITOS.md`). O scaffold ainda não existe.
+- Estado atual: **fase 0 concluída** — scaffold Next.js + TypeScript + SQLite de pé, contrato congelado em `docs/api.md`, `db/schema.sql` e `lib/prices.ts` (superfície), com testes de contrato verdes. Fluxos de backend, frontend e auth ainda não começaram.
 
 ## Stack padrão (confirmar antes de codar)
 
@@ -98,18 +98,21 @@ Depois disso, mudança de schema ou de resposta JSON **exige** atualizar o doc e
 
 ## Comandos
 
-Ainda não existem; o Integrador deve criá-los no scaffold e manter esta lista correta:
+Criados no scaffold pelo Integrador; manter esta lista correta:
 
 ```bash
-npm run dev        # servidor local
-npm run db:reset   # aplica schema + seed de demonstração
-npm test           # testes unitários (regras de negócio) — obrigatório
+npm run dev        # servidor local (localhost:3000)
+npm run db:reset   # recria o banco: schema + db/seed.ts (quando existir)
+npm test           # testes unitários + contrato — obrigatório
 npm run test:watch # testes durante o desenvolvimento
-npm run smoke      # valida os critérios de aceite 1–6 contra localhost
-npm run typecheck
+npm run smoke      # critérios de aceite contra localhost (SMOKE_STRICT=1 após integração)
+npm run typecheck  # tsc --noEmit
+npm run build      # build de produção
+npm start          # executa o build
 ```
 
-Enquanto o scaffold não existir, não invente comandos nem afirme que testes passaram.
+No Windows, use `npm.cmd` se a Execution Policy bloquear `npm`.
+Não afirme que um teste passou sem rodar o comando nesta sessão.
 
 ## Dados da demo
 

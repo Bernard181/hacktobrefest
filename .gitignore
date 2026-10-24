@@ -1,0 +1,27 @@
+# dependencias
+node_modules/
+
+# build
+.next/
+out/
+dist/
+next-env.d.ts
+
+# banco local (regenerado por npm run db:reset)
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# segredos
+.env
+.env.local
+.env*.local
+
+# misc
+*.log
+.DS_Store
+Thumbs.db
+coverage/
+tsconfig.tsbuildinfo
